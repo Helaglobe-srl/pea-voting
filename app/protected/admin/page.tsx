@@ -56,7 +56,6 @@ export default async function AdminDashboard() {
   
   // Fetch projects and criteria
   const { data: projects } = await supabase.from("projects").select("*").order("id");
-  const { data: criteria } = await supabase.from("voting_criteria").select("*").order("id");
 
   // Create vote matrix: user -> project -> criteria -> score
   const voteMatrix = new Map<string, Map<number, Map<number, number>>>();

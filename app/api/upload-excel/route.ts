@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import * as XLSX from 'xlsx';
 
 interface ExcelRow {
-  [key: string]: any;
+  [key: string]: string | number | boolean | null | undefined;
 }
 
 export async function POST(request: NextRequest) {
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       for (const name of possibleNames) {
         const found = keys.find(key => key.toLowerCase() === name.toLowerCase());
         if (found && row[found] !== undefined && row[found] !== null && row[found] !== '') {
-          return row[found];
+          return String(row[found]);
         }
       }
       
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
           name.toLowerCase().includes(key.toLowerCase())
         );
         if (found && row[found] !== undefined && row[found] !== null && row[found] !== '') {
-          return row[found];
+          return String(row[found]);
         }
       }
       

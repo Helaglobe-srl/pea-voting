@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { InfoIcon, UserIcon, BarChart3Icon, AlertCircleIcon, CheckCircleIcon } from "lucide-react";
+import { InfoIcon, UserIcon, AlertCircleIcon, CheckCircleIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -81,7 +81,7 @@ export default async function ProtectedPage({ searchParams }: { searchParams: Pr
       <div className="w-full">
         <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
           <InfoIcon size="16" strokeWidth={2} />
-          benvenuto nella piattaforma di votazione per l'engagement dei pazienti
+          benvenuto nella piattaforma di votazione per l&apos;engagement dei pazienti
         </div>
       </div>
 

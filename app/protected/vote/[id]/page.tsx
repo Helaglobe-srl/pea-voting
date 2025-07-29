@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import ProjectVotingForm from "@/components/project-voting-form";
 
-export default async function VotePage({ params }: { params: { id: string } }) {
-  const projectId = parseInt(params.id);
+export default async function VotePage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+  const projectId = parseInt(resolvedParams.id);
   const supabase = await createClient();
 
   // Check if user is authenticated

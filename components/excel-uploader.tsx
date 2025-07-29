@@ -2,19 +2,13 @@
 
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/lib/supabase/client";
 import { UploadIcon, FileSpreadsheetIcon, CheckCircleIcon, XCircleIcon } from "lucide-react";
-
-interface ExcelRow {
-  [key: string]: any;
-}
 
 export default function ExcelUploader() {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState("");
-  const [preview, setPreview] = useState<ExcelRow[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,7 +76,6 @@ export default function ExcelUploader() {
     setFile(null);
     setUploadStatus('idle');
     setMessage("");
-    setPreview([]);
     // reset file input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
