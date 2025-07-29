@@ -96,23 +96,23 @@ export default function ProjectVotingForm({ projectId, criteria, existingVotes, 
   };
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6 sm:gap-8">
       {criteria.map((criterion) => (
-        <Card key={criterion.id} className="p-4">
-          <div className="flex flex-col gap-4">
+        <Card key={criterion.id} className="p-3 sm:p-4">
+          <div className="flex flex-col gap-3 sm:gap-4">
             <div>
-              <h3 className="font-semibold text-lg">{criterion.name}</h3>
-              <p className="text-muted-foreground">{criterion.description}</p>
+              <h3 className="font-semibold text-base sm:text-lg">{criterion.name}</h3>
+              <p className="text-sm sm:text-base text-muted-foreground mt-1">{criterion.description}</p>
             </div>
             
-            <div className="flex flex-wrap gap-3 mt-2">
+            <div className="flex flex-wrap justify-center sm:justify-start gap-2 sm:gap-3 mt-2">
               {[1, 2, 3, 4, 5].map((score) => (
                 <Button
                   key={score}
                   type="button"
                   variant={votes[criterion.id] === score ? "default" : "outline"}
                   onClick={() => handleVoteChange(criterion.id, score)}
-                  className="w-12 h-12"
+                  className="w-14 h-14 text-lg font-semibold sm:w-12 sm:h-12 sm:text-base"
                 >
                   {score}
                 </Button>
@@ -131,7 +131,7 @@ export default function ProjectVotingForm({ projectId, criteria, existingVotes, 
       <Button 
         onClick={handleSubmit} 
         disabled={isSubmitting}
-        className="mt-4"
+        className="mt-2 w-full sm:w-auto sm:self-start text-base py-3"
       >
         {isSubmitting ? "invio in corso..." : "invia voti"}
       </Button>

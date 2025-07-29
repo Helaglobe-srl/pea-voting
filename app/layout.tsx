@@ -13,6 +13,11 @@ export const metadata: Metadata = {
   description: "Vota per le iniziative di engagement del paziente",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   display: "swap",

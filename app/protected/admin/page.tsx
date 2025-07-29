@@ -101,28 +101,31 @@ export default async function AdminDashboard() {
 
   return (
     <div className="flex-1 w-full flex flex-col gap-8">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
         <div>
-          <h1 className="text-3xl font-bold">🛠️ admin dashboard</h1>
-          <p className="text-muted-foreground">comprehensive voting overview (normal users only)</p>
+          <h1 className="text-2xl sm:text-3xl font-bold">🛠️ admin dashboard</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">comprehensive voting overview (normal users only)</p>
         </div>
-        <div className="flex gap-3">
-          <Button asChild variant="outline">
-            <Link href="/protected/admin/upload" className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+          <Button asChild variant="outline" size="sm" className="flex-1 sm:flex-none">
+            <Link href="/protected/admin/upload" className="flex items-center justify-center gap-2">
               <UploadIcon size={16} />
-              upload excel
+              <span className="hidden xs:inline">upload excel</span>
+              <span className="xs:hidden">upload</span>
             </Link>
           </Button>
-          <Button asChild variant="outline">
-            <Link href="/protected/results" className="flex items-center gap-2">
+          <Button asChild variant="outline" size="sm" className="flex-1 sm:flex-none">
+            <Link href="/protected/results" className="flex items-center justify-center gap-2">
               <BarChart3Icon size={16} />
-              detailed results
+              <span className="hidden xs:inline">detailed results</span>
+              <span className="xs:hidden">results</span>
             </Link>
           </Button>
-          <Button asChild variant="outline">
-            <Link href="/protected/profile" className="flex items-center gap-2">
+          <Button asChild variant="outline" size="sm" className="flex-1 sm:flex-none">
+            <Link href="/protected/profile" className="flex items-center justify-center gap-2">
               <ArrowLeftIcon size={16} />
-              profile
+              <span className="hidden xs:inline">profile</span>
+              <span className="xs:hidden">back</span>
             </Link>
           </Button>
         </div>
@@ -164,7 +167,56 @@ export default async function AdminDashboard() {
       {/* Voting Matrix Table */}
       <Card className="p-6">
         <h2 className="text-xl font-semibold mb-6">📊 voting matrix - average scores per user</h2>
-        <div className="overflow-x-auto">
+        
+        {/* Mobile-first responsive table */}
+        <div className="block lg:hidden">
+          {/* Mobile Card Layout */}
+          <div className="space-y-4">
+            {regularUsers.map(user => {
+              const userScores = projects?.map(project => getAverageScore(user.id, project.id)).filter((score): score is number => score !== null) || [];
+              const userAverage = userScores.length > 0 
+                ? parseFloat((userScores.reduce((sum, score) => sum + score, 0) / userScores.length).toFixed(1))
+                : 0;
+
+              return (
+                <Card key={user.id} className="p-4">
+                  <div className="space-y-3">
+                    <div className="font-medium text-sm border-b pb-2">
+                      {user.email}
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      {projects?.map(project => {
+                        const score = getAverageScore(user.id, project.id);
+                        return (
+                          <div key={project.id} className="flex justify-between items-center p-2 bg-muted/50 rounded">
+                            <span className="truncate pr-2">{project.name}</span>
+                            {score !== null ? (
+                              <span className={`inline-block px-2 py-1 rounded text-white text-xs font-medium ${
+                                score >= 4 ? 'bg-green-500' : 
+                                score >= 3 ? 'bg-yellow-500' : 
+                                score >= 2 ? 'bg-orange-500' : 'bg-red-500'
+                              }`}>
+                                {score}
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground">-</span>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div className="text-right text-sm font-bold border-t pt-2">
+                      User Average: {userAverage > 0 ? userAverage : '-'}
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Desktop Table Layout */}
+        <div className="hidden lg:block overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="bg-muted">
