@@ -89,7 +89,7 @@ export default function ProjectVotingForm({ projectId, criteria, existingVotes, 
       }, 1500);
     } catch (error) {
       console.error("Error submitting votes:", error);
-      setMessage("si è verificato un errore durante l'invio dei voti. riprova.");
+      setMessage("si è verificato un errore durante l&apos;invio dei voti. riprova.");
     } finally {
       setIsSubmitting(false);
     }

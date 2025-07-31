@@ -13,7 +13,7 @@ export function Hero() {
       </div>
       <p className="text-xl lg:text-2xl !leading-tight mx-auto max-w-3xl text-center text-muted-foreground">
         Partecipa alla valutazione delle migliori iniziative di engagement del paziente. 
-        La tua voce conta per riconoscere l'eccellenza nell'assistenza sanitaria.
+        La tua voce conta per riconoscere l&apos;eccellenza nell&apos;assistenza sanitaria.
       </p>
       <div className="w-full max-w-2xl mx-auto">
         <div className="h-1 pea-gradient rounded-full" />
