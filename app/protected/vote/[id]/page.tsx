@@ -19,10 +19,7 @@ export default async function VotePage({ params }: { params: Promise<{ id: strin
   // Fetch project details with detailed information
   const { data: project, error: projectError } = await supabase
     .from("projects")
-    .select(`
-      *,
-      project_details (*)
-    `)
+    .select("*")
     .eq("id", projectId)
     .single();
 
@@ -87,8 +84,6 @@ export default async function VotePage({ params }: { params: Promise<{ id: strin
   const nextProjectId = unvotedProjects.length > 0 ? 
     Math.min(...unvotedProjects.map(p => p.id)) : undefined;
 
-  const projectDetails = project.project_details?.[0];
-
   return (
     <div className="flex-1 w-full flex flex-col gap-8">
       <div className="flex justify-between items-center">
@@ -99,86 +94,80 @@ export default async function VotePage({ params }: { params: Promise<{ id: strin
       </div>
 
       {/* Project Information Section */}
-      {projectDetails && (
-        <div className="space-y-6">
-          {/* Jury Information - Most Important */}
-          {projectDetails.jury_info && (
-            <Card className="p-6 border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800">
-              <h2 className="text-xl font-semibold mb-4 text-blue-800 dark:text-blue-200">
-                ⚖️ Informazioni per la giuria
-              </h2>
-              <p className="text-blue-900 dark:text-blue-100 leading-relaxed">
-                {projectDetails.jury_info}
-              </p>
+      <div className="space-y-6">
+        {/* Jury Information - Most Important */}
+        {project.jury_info && (
+          <Card className="p-6 border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800">
+            <h2 className="text-xl font-semibold mb-4 text-blue-800 dark:text-blue-200">
+              ⚖️ Informazioni per la giuria
+            </h2>
+            <p className="text-blue-900 dark:text-blue-100 leading-relaxed">
+              {project.jury_info}
+            </p>
+          </Card>
+        )}
+
+        {/* Project Details Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {project.organization_name && (
+            <Card className="p-4">
+              <h3 className="font-semibold text-sm text-muted-foreground mb-2">🏢 Organizzazione</h3>
+              <p className="font-medium">{project.organization_name}</p>
             </Card>
           )}
 
-          {/* Project Details Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {projectDetails.organization_name && (
-              <Card className="p-4">
-                <h3 className="font-semibold text-sm text-muted-foreground mb-2">🏢 Organizzazione</h3>
-                <p className="font-medium">{projectDetails.organization_name}</p>
-              </Card>
-            )}
-
-            {projectDetails.organization_type && (
-              <Card className="p-4">
-                <h3 className="font-semibold text-sm text-muted-foreground mb-2">🏷️ Tipo di organizzazione</h3>
-                <p className="font-medium">{projectDetails.organization_type}</p>
-              </Card>
-            )}
-
-            {projectDetails.project_category && (
-              <Card className="p-4">
-                <h3 className="font-semibold text-sm text-muted-foreground mb-2">📂 Categoria</h3>
-                <p className="font-medium">{projectDetails.project_category}</p>
-              </Card>
-            )}
-
-            {projectDetails.therapeutic_area && (
-              <Card className="p-4">
-                <h3 className="font-semibold text-sm text-muted-foreground mb-2">🩺 Area terapeutica</h3>
-                <p className="font-medium">{projectDetails.therapeutic_area}</p>
-              </Card>
-            )}
-
-
-          </div>
-
-          {/* Objectives and Results */}
-          {projectDetails.objectives_results && (
-            <Card className="p-6">
-              <h3 className="font-semibold text-lg mb-4">🎯 Obiettivi e risultati</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                {projectDetails.objectives_results}
-              </p>
+          {project.organization_type && (
+            <Card className="p-4">
+              <h3 className="font-semibold text-sm text-muted-foreground mb-2">🏷️ Tipo di organizzazione</h3>
+              <p className="font-medium">{project.organization_type}</p>
             </Card>
           )}
 
+          {project.project_category && (
+            <Card className="p-4">
+              <h3 className="font-semibold text-sm text-muted-foreground mb-2">📂 Categoria</h3>
+              <p className="font-medium">{project.project_category}</p>
+            </Card>
+          )}
 
-
-          {/* Presentation Link */}
-          {projectDetails.presentation_link && (
-            <Card className="p-6">
-              <h3 className="font-semibold text-lg mb-4">📊 Presentazione</h3>
-              <a 
-                href={projectDetails.presentation_link} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline flex items-center gap-2"
-              >
-                🔗 Visualizza presentazione del progetto →
-              </a>
+          {project.therapeutic_area && (
+            <Card className="p-4">
+              <h3 className="font-semibold text-sm text-muted-foreground mb-2">🩺 Area terapeutica</h3>
+              <p className="font-medium">{project.therapeutic_area}</p>
             </Card>
           )}
         </div>
-      )}
 
-      {/* Fallback for projects without detailed information */}
-      {!projectDetails && (
-        <p className="text-lg text-muted-foreground">📝 Nessuna descrizione disponibile</p>
-      )}
+        {/* Objectives and Results */}
+        {project.objectives_results && (
+          <Card className="p-6">
+            <h3 className="font-semibold text-lg mb-4">🎯 Obiettivi e risultati</h3>
+            <p className="text-muted-foreground leading-relaxed">
+              {project.objectives_results}
+            </p>
+          </Card>
+        )}
+
+        {/* Presentation Link */}
+        {project.presentation_link && (
+          <Card className="p-6">
+            <h3 className="font-semibold text-lg mb-4">📊 Presentazione</h3>
+            <a 
+              href={project.presentation_link} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline flex items-center gap-2"
+            >
+              🔗 Visualizza presentazione del progetto →
+            </a>
+          </Card>
+        )}
+
+        {/* Fallback message if no detailed information is available */}
+        {!project.jury_info && !project.objectives_results && !project.organization_name && (
+          <p className="text-lg text-muted-foreground">📝 Nessuna descrizione disponibile</p>
+        )}
+      </div>
 
       {/* Voting Section */}
       <Card className="p-6">

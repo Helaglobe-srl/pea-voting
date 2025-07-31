@@ -50,13 +50,7 @@ export default async function ResultsPage() {
   // Fetch projects and criteria
   const { data: projects, error: projectsError } = await supabase
     .from("projects")
-    .select(`
-      *,
-      project_details (
-        jury_info,
-        objectives_results
-      )
-    `)
+    .select("*")
     .order("id");
 
   const { data: criteria, error: criteriaError } = await supabase
@@ -148,8 +142,8 @@ export default async function ResultsPage() {
             
             <p className="text-muted-foreground mb-6">
               {truncateText(
-                project.project_details?.[0]?.jury_info || 
-                project.project_details?.[0]?.objectives_results || 
+                project.jury_info || 
+                project.objectives_results || 
                 'nessuna descrizione disponibile'
               )}
             </p>

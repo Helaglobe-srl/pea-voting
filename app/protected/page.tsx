@@ -39,13 +39,7 @@ export default async function ProtectedPage({ searchParams }: { searchParams: Pr
   // Fetch projects from the database (only for regular users)
   const { data: projects, error: projectsError } = await supabase
     .from("projects")
-    .select(`
-      *,
-      project_details (
-        jury_info,
-        objectives_results
-      )
-    `)
+    .select("*")
     .order("id");
 
   if (projectsError) {
@@ -173,8 +167,8 @@ export default async function ProtectedPage({ searchParams }: { searchParams: Pr
                   </div>
                   <p className="text-sm sm:text-base text-muted-foreground flex-grow leading-relaxed">
                     {truncateText(
-                      project.project_details?.[0]?.jury_info || 
-                      project.project_details?.[0]?.objectives_results || 
+                      project.jury_info || 
+                      project.objectives_results || 
                       'nessuna descrizione disponibile',
                       120
                     )}

@@ -127,10 +127,11 @@ export async function POST(request: NextRequest) {
         }
 
         if (existingProject) {
-          // project already exists - update the details instead of creating new
-          const { error: updateDetailsError } = await supabase
-            .from('project_details')
+          // project already exists - update all details directly in projects table
+          const { error: updateError } = await supabase
+            .from('projects')
             .update({
+              name: projectData.project_title,
               organization_name: projectData.organization_name,
               project_title: projectData.project_title,
               project_category: projectData.project_category,
@@ -138,36 +139,23 @@ export async function POST(request: NextRequest) {
               therapeutic_area: projectData.therapeutic_area,
               jury_info: projectData.jury_info,
               objectives_results: projectData.objectives_results,
-              presentation_link: projectData.presentation_link
+              presentation_link: projectData.presentation_link,
+              updated_at: new Date().toISOString()
             })
-            .eq('project_id', existingProject.id);
+            .eq('id', existingProject.id);
 
-          if (updateDetailsError) {
-            console.error('Error updating project details:', updateDetailsError);
+          if (updateError) {
+            console.error('Error updating project:', updateError);
             continue;
           }
 
           updatedCount++;
         } else {
-          // project doesn't exist - create new one
-          const { data: project, error: projectError } = await supabase
+          // project doesn't exist - create new one with all data
+          const { error: projectError } = await supabase
             .from('projects')
             .insert({
-              name: projectData.project_title
-            })
-            .select()
-            .single();
-
-          if (projectError) {
-            console.error('Error inserting project:', projectError);
-            continue;
-          }
-
-          // insert project details
-          const { error: detailsError } = await supabase
-            .from('project_details')
-            .insert({
-              project_id: project.id,
+              name: projectData.project_title,
               organization_name: projectData.organization_name,
               project_title: projectData.project_title,
               project_category: projectData.project_category,
@@ -178,8 +166,8 @@ export async function POST(request: NextRequest) {
               presentation_link: projectData.presentation_link
             });
 
-          if (detailsError) {
-            console.error('Error inserting project details:', detailsError);
+          if (projectError) {
+            console.error('Error inserting project:', projectError);
             continue;
           }
 
