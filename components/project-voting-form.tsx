@@ -17,13 +17,15 @@ interface VotingFormProps {
   criteria: Criteria[];
   existingVotes: Record<number, number>;
   userId: string;
+  nextProjectId?: number;
 }
 
-export default function ProjectVotingForm({ projectId, criteria, existingVotes, userId }: VotingFormProps) {
+export default function ProjectVotingForm({ projectId, criteria, existingVotes, userId, nextProjectId }: VotingFormProps) {
   const router = useRouter();
   const [votes, setVotes] = useState<Record<number, number>>(existingVotes);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState("");
+  const [showNextProjectPopup, setShowNextProjectPopup] = useState(false);
 
   const handleVoteChange = (criteriaId: number, score: number) => {
     setVotes((prev) => ({
@@ -83,16 +85,32 @@ export default function ProjectVotingForm({ projectId, criteria, existingVotes, 
       // Refresh the page data
       router.refresh();
       
-      // Redirect after a short delay
-      setTimeout(() => {
-        router.push("/protected");
-      }, 1500);
+      // Show popup if there's a next project, otherwise redirect after delay
+      if (nextProjectId) {
+        setTimeout(() => {
+          setShowNextProjectPopup(true);
+        }, 1500);
+      } else {
+        setTimeout(() => {
+          router.push("/protected");
+        }, 1500);
+      }
     } catch (error) {
       console.error("Error submitting votes:", error);
       setMessage("si è verificato un errore durante l&apos;invio dei voti. riprova.");
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleGoToNextProject = () => {
+    setShowNextProjectPopup(false);
+    router.push(`/protected/vote/${nextProjectId}`);
+  };
+
+  const handleGoToProjectsPage = () => {
+    setShowNextProjectPopup(false);
+    router.push("/protected");
   };
 
   return (
@@ -137,6 +155,30 @@ export default function ProjectVotingForm({ projectId, criteria, existingVotes, 
           {isSubmitting ? "invio in corso..." : "Inserisci voti"}
         </Button>
       </div>
+
+      {/* Next Project Popup */}
+      {showNextProjectPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <Card className="max-w-md mx-4 p-6">
+            <div className="text-center">
+              <h3 className="text-lg font-semibold mb-4">
+                proseguire al progetto successivo?
+              </h3>
+              <p className="text-sm text-muted-foreground mb-6">
+                vuoi continuare a votare il prossimo progetto che non hai ancora votato o tornare alla lista generale?
+              </p>
+              <div className="flex gap-3 justify-center">
+                <Button onClick={handleGoToProjectsPage} variant="outline">
+                  torna alla lista
+                </Button>
+                <Button onClick={handleGoToNextProject}>
+                  prossimo progetto
+                </Button>
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 } 

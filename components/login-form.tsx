@@ -90,7 +90,14 @@ export function LoginForm({
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Accesso in corso..." : "Accedi"}
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    accesso in corso...
+                  </div>
+                ) : (
+                  "Accedi"
+                )}
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">

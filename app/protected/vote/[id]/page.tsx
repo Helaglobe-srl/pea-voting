@@ -58,6 +58,35 @@ export default async function VotePage({ params }: { params: Promise<{ id: strin
     return acc;
   }, {} as Record<number, number>) || {};
 
+  // Fetch all projects to determine the next project
+  const { data: allProjects } = await supabase
+    .from("projects")
+    .select("id")
+    .order("id");
+
+  // Get all user's votes to check completion status
+  const { data: allUserVotes } = await supabase
+    .from("votes")
+    .select("project_id, criteria_id")
+    .eq("user_id", sessionData.session.user.id);
+
+  const totalCriteria = criteria?.length || 0;
+
+  // Function to check if user has completed voting for a project
+  const hasCompletedVoting = (checkProjectId: number) => {
+    if (!allUserVotes) return false;
+    const projectVotes = allUserVotes.filter(vote => vote.project_id === checkProjectId);
+    return projectVotes.length === totalCriteria;
+  };
+
+  // Find the minimum project ID among those that the user hasn't completed voting on yet
+  // Exclude the current project since they're about to vote on it
+  const unvotedProjects = allProjects?.filter(p => 
+    p.id !== projectId && !hasCompletedVoting(p.id)
+  ) || [];
+  const nextProjectId = unvotedProjects.length > 0 ? 
+    Math.min(...unvotedProjects.map(p => p.id)) : undefined;
+
   const projectDetails = project.project_details?.[0];
 
   return (
@@ -158,7 +187,8 @@ export default async function VotePage({ params }: { params: Promise<{ id: strin
           projectId={projectId} 
           criteria={criteria || []} 
           existingVotes={userVotes} 
-          userId={sessionData.session.user.id} 
+          userId={sessionData.session.user.id}
+          nextProjectId={nextProjectId}
         />
       </Card>
     </div>
