@@ -41,7 +41,15 @@ export default async function AdminDashboard() {
 
   const regularUserVotes = (votesWithEmails as VoteWithEmail[]) || [];
   
-  // Get unique regular users
+  // Get total count of registered users (excluding admin) from auth.users using RPC
+  const { data: totalUsersCount, error: usersCountError } = await supabase
+    .rpc('get_total_users_count', { admin_email_param: adminEmail });
+  
+  if (usersCountError) {
+    console.error("Error fetching total users count:", usersCountError);
+  }
+
+  // Get unique users from votes for the matrix (users who have voted)
   const userEmailMap = new Map<string, string>();
   regularUserVotes.forEach(vote => {
     if (vote.email) {
@@ -53,6 +61,9 @@ export default async function AdminDashboard() {
     id: userId,
     email: email
   }));
+
+  // Total registered users count (for "Giurati totali")
+  const totalJurors = (totalUsersCount as number) || 0;
   
   // Calculate number of users who have voted at least 1 project (Giurati Votanti)
   const usersWhoVoted = new Set<string>();
@@ -128,13 +139,7 @@ export default async function AdminDashboard() {
               <span className="xs:hidden">risultati</span>
             </Link>
           </Button>
-          <Button asChild variant="outline" size="sm" className="flex-1 sm:flex-none">
-            <Link href="/protected/profile" className="flex items-center justify-center gap-2">
-              <ArrowLeftIcon size={16} />
-              <span className="hidden xs:inline">profilo</span>
-              <span className="xs:hidden">indietro</span>
-            </Link>
-          </Button>
+          {/* Dashboard label removed as requested */}
         </div>
       </div>
 
@@ -145,7 +150,7 @@ export default async function AdminDashboard() {
             <UsersIcon className="h-8 w-8 text-blue-500" />
             <div>
               <p className="text-sm text-muted-foreground">Giurati totali</p>
-              <p className="text-2xl font-bold">{regularUsers.length}</p>
+              <p className="text-2xl font-bold">{totalJurors}</p>
             </div>
           </div>
         </Card>
@@ -295,7 +300,7 @@ export default async function AdminDashboard() {
 
       {/* Legend */}
       <Card className="p-4">
-                        <h3 className="font-semibold mb-3">🎨 legenda punteggi</h3>
+                        <h3 className="font-semibold mb-3">🎨 Legenda punteggi</h3>
         <div className="flex gap-4 text-xs">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-green-500 rounded"></div>

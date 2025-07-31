@@ -19,10 +19,12 @@ export async function NavLinks() {
 
   return (
     <div className="flex items-center gap-4">
-      {/* show profilo link for all authenticated users */}
-      <Link href="/protected/profile" className="hover:underline">
-        Profilo
-      </Link>
+      {/* show profilo link only for normal users (not admin) */}
+      {!isAdmin && (
+        <Link href="/protected/profile" className="hover:underline">
+          Profilo
+        </Link>
+      )}
       
       {/* show vote link only for normal users (not admin) */}
       {!isAdmin && (
