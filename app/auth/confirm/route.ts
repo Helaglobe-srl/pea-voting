@@ -9,13 +9,23 @@ export async function GET(request: NextRequest) {
   const token = searchParams.get("token");
   const type = searchParams.get("type") as EmailOtpType | null;
   const next = searchParams.get("next") ?? "/protected";
+  const code = searchParams.get("code");
 
-  // handle both old token_hash format and new token format
+  const supabase = await createClient();
+
+  // handle pkce code exchange flow (modern supabase)
+  if (code) {
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    if (!error) {
+      redirect(next);
+    } else {
+      redirect(`/auth/error?error=${encodeURIComponent(error.message)}`);
+    }
+  }
+
+  // handle traditional token-based verification
   const finalToken = token_hash || token;
-
   if (finalToken && type) {
-    const supabase = await createClient();
-
     const { error } = await supabase.auth.verifyOtp({
       type,
       token_hash: finalToken,
@@ -30,10 +40,17 @@ export async function GET(request: NextRequest) {
       }
     } else {
       // redirect the user to an error page with some instructions
-      redirect(`/auth/error?error=${error?.message}`);
+      redirect(`/auth/error?error=${encodeURIComponent(error.message)}`);
     }
   }
 
+  // if no tokens provided, check if user is already authenticated
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (user && !userError) {
+    // user is already authenticated, redirect to next page
+    redirect(next);
+  }
+
   // redirect the user to an error page with some instructions
-  redirect(`/auth/error?error=no token or token_hash provided`);
+  redirect(`/auth/error?error=${encodeURIComponent("no authentication token provided")}`);
 }
