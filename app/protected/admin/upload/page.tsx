@@ -25,14 +25,13 @@ export default async function AdminUploadPage() {
   return (
     <div className="flex-1 w-full flex flex-col gap-8">
       <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">upload project data</h1>
-          <p className="text-muted-foreground">upload excel file with project candidatures</p>
-        </div>
+          <div>
+            <h1 className="text-3xl font-bold">Carica dati progetti</h1>
+          </div>
         <Button asChild variant="outline">
           <Link href="/protected/admin" className="flex items-center gap-2">
             <ArrowLeftIcon size={16} />
-            back to dashboard
+            torna alla dashboard
           </Link>
         </Button>
       </div>
@@ -42,8 +41,7 @@ export default async function AdminUploadPage() {
           <div className="flex items-center gap-3">
             <UploadIcon className="h-8 w-8 text-blue-500" />
             <div>
-              <h2 className="text-xl font-semibold">excel file upload</h2>
-              <p className="text-muted-foreground">upload candidature_pea_2025.xlsx or similar format</p>
+              <h2 className="text-xl font-semibold">Caricamento file excel</h2>
             </div>
           </div>
           
@@ -54,16 +52,16 @@ export default async function AdminUploadPage() {
       </Card>
 
       <Card className="p-4">
-        <h3 className="font-semibold mb-3">expected columns</h3>
+        <h3 className="font-semibold mb-3">Colonne previste nel file xlsx:</h3>
         <div className="text-sm text-muted-foreground space-y-1">
-          <p>• <strong>categoria</strong> - project category</p>
-          <p>• <strong>ragione sociale</strong> - organization name</p>
-          <p>• <strong>tipologia</strong> - organization type</p>
-          <p>• <strong>titolo progetto</strong> - project title</p>
-          <p>• <strong>area terapeutica</strong> - therapeutic area</p>
-          <p>• <strong>info giuria</strong> - information for jury (shown to voters)</p>
-          <p>• <strong>obiettivi risultati</strong> - objectives and results</p>
-          <p>• <strong>link presentazione</strong> - presentation link</p>
+          <p>• <strong>categoria</strong></p>
+          <p>• <strong>ragione sociale</strong></p>
+          <p>• <strong>tipologia</strong></p>
+          <p>• <strong>titolo progetto</strong></p>
+          <p>• <strong>area terapeutica</strong></p>
+          <p>• <strong>info giuria</strong></p>
+          <p>• <strong>obiettivi risultati</strong></p>
+          <p>• <strong>link presentazione</strong></p>
         </div>
       </Card>
     </div>

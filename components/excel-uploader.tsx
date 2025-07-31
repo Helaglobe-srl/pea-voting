@@ -22,7 +22,7 @@ export default function ExcelUploader() {
       try {
         // For now, we'll just show the file is selected
         // In a real implementation, you'd use a library like xlsx to parse
-        setMessage(`File selected: ${selectedFile.name} (${(selectedFile.size / 1024).toFixed(1)} KB)`);
+        setMessage(`File selezionato: ${selectedFile.name} (${(selectedFile.size / 1024).toFixed(1)} KB)`);
       } catch (error) {
         console.error("Error previewing file:", error);
       }
@@ -54,7 +54,8 @@ export default function ExcelUploader() {
       if (response.ok) {
         const result = await response.json();
         setUploadStatus('success');
-        setMessage(`Successfully uploaded ${result.projectsCount} projects!`);
+        const { projectsCount = 0, updatedCount = 0, totalProcessed = 0 } = result;
+        setMessage(`Elaborati con successo ${totalProcessed} progetti! (${projectsCount} nuovi, ${updatedCount} aggiornati)`);
         
         // Refresh the page after a delay
         setTimeout(() => {
@@ -66,7 +67,7 @@ export default function ExcelUploader() {
     } catch (error) {
       console.error("Error uploading file:", error);
       setUploadStatus('error');
-      setMessage("Error uploading file. Please try again or check the file format.");
+      setMessage("Errore durante il caricamento del file. Riprova o controlla il formato del file.");
     } finally {
       setIsUploading(false);
     }
@@ -87,7 +88,7 @@ export default function ExcelUploader() {
       {!file ? (
         <div className="text-center">
           <FileSpreadsheetIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-          <p className="text-muted-foreground mb-4">select an excel file to upload project candidatures</p>
+          <p className="text-muted-foreground mb-4">seleziona un file excel per caricare le candidature dei progetti</p>
           <div>
             <input
               ref={fileInputRef}
@@ -102,7 +103,7 @@ export default function ExcelUploader() {
               onClick={() => fileInputRef.current?.click()}
             >
               <UploadIcon size={16} />
-              choose excel file
+              scegli file excel
             </Button>
           </div>
         </div>
@@ -141,15 +142,15 @@ export default function ExcelUploader() {
               className="flex items-center gap-2"
             >
               <UploadIcon size={16} />
-              {isUploading ? "processing..." : "upload & process"}
+              {isUploading ? "elaborazione in corso..." : "carica ed elabora"}
             </Button>
             <Button variant="outline" onClick={resetUpload} disabled={isUploading}>
-              cancel
+              annulla
             </Button>
           </div>
           
           <p className="text-xs text-muted-foreground mt-4">
-            This will replace existing project data and update the voting projects.
+            questo aggiungerà nuovi progetti e aggiornerà quelli esistenti con lo stesso nome.
           </p>
         </div>
       )}

@@ -107,50 +107,85 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No valid projects found in Excel file' }, { status: 400 });
     }
 
-    // Clear existing projects and project details
-    await supabase.from('project_details').delete().neq('id', 0);
-    await supabase.from('projects').delete().neq('id', 0);
-
-    // insert new projects and their details
+    // append new projects to existing ones (no deletion)
     let projectsCount = 0;
+    let skippedCount = 0;
+    let updatedCount = 0;
     
     for (const projectData of processedProjects) {
       try {
-        // insert project
-        const { data: project, error: projectError } = await supabase
+        // check if project already exists by name
+        const { data: existingProject, error: checkError } = await supabase
           .from('projects')
-          .insert({
-            name: projectData.project_title
-          })
-          .select()
+          .select('id')
+          .eq('name', projectData.project_title)
           .single();
 
-        if (projectError) {
-          console.error('Error inserting project:', projectError);
+        if (checkError && checkError.code !== 'PGRST116') {
+          // error other than "no rows returned"
+          console.error('Error checking existing project:', checkError);
           continue;
         }
 
-        // insert project details
-        const { error: detailsError } = await supabase
-          .from('project_details')
-          .insert({
-            project_id: project.id,
-            organization_name: projectData.organization_name,
-            project_title: projectData.project_title,
-            project_category: projectData.project_category,
-            organization_type: projectData.organization_type,
-            therapeutic_area: projectData.therapeutic_area,
-            jury_info: projectData.jury_info,
-            objectives_results: projectData.objectives_results,
-            presentation_link: projectData.presentation_link
-          });
+        if (existingProject) {
+          // project already exists - update the details instead of creating new
+          const { error: updateDetailsError } = await supabase
+            .from('project_details')
+            .update({
+              organization_name: projectData.organization_name,
+              project_title: projectData.project_title,
+              project_category: projectData.project_category,
+              organization_type: projectData.organization_type,
+              therapeutic_area: projectData.therapeutic_area,
+              jury_info: projectData.jury_info,
+              objectives_results: projectData.objectives_results,
+              presentation_link: projectData.presentation_link
+            })
+            .eq('project_id', existingProject.id);
 
-        if (detailsError) {
-          console.error('Error inserting project details:', detailsError);
-          continue;
+          if (updateDetailsError) {
+            console.error('Error updating project details:', updateDetailsError);
+            continue;
+          }
+
+          updatedCount++;
+        } else {
+          // project doesn't exist - create new one
+          const { data: project, error: projectError } = await supabase
+            .from('projects')
+            .insert({
+              name: projectData.project_title
+            })
+            .select()
+            .single();
+
+          if (projectError) {
+            console.error('Error inserting project:', projectError);
+            continue;
+          }
+
+          // insert project details
+          const { error: detailsError } = await supabase
+            .from('project_details')
+            .insert({
+              project_id: project.id,
+              organization_name: projectData.organization_name,
+              project_title: projectData.project_title,
+              project_category: projectData.project_category,
+              organization_type: projectData.organization_type,
+              therapeutic_area: projectData.therapeutic_area,
+              jury_info: projectData.jury_info,
+              objectives_results: projectData.objectives_results,
+              presentation_link: projectData.presentation_link
+            });
+
+          if (detailsError) {
+            console.error('Error inserting project details:', detailsError);
+            continue;
+          }
+
+          projectsCount++;
         }
-
-        projectsCount++;
       } catch (error) {
         console.error('Error processing project:', error);
         continue;
@@ -160,7 +195,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       success: true, 
       projectsCount,
-      message: `successfully processed ${projectsCount} projects from excel file`
+      updatedCount,
+      totalProcessed: projectsCount + updatedCount,
+      message: `successfully processed ${projectsCount + updatedCount} projects from excel file (${projectsCount} new, ${updatedCount} updated)`
     });
 
   } catch (error) {
