@@ -109,7 +109,6 @@ export async function POST(request: NextRequest) {
 
     // append new projects to existing ones (no deletion)
     let projectsCount = 0;
-    let skippedCount = 0;
     let updatedCount = 0;
     
     for (const projectData of processedProjects) {

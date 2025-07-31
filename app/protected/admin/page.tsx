@@ -3,7 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeftIcon, UsersIcon, BarChart3Icon, UploadIcon } from "lucide-react";
+import { UsersIcon, BarChart3Icon, UploadIcon } from "lucide-react";
 
 interface VoteWithEmail {
   id: number;
