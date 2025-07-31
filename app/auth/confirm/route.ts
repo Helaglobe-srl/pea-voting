@@ -17,8 +17,13 @@ export async function GET(request: NextRequest) {
       token_hash,
     });
     if (!error) {
-      // redirect user to specified redirect URL or root of app
-      redirect(next);
+      // for password recovery, ensure user goes to update password page
+      if (type === "recovery") {
+        redirect("/auth/update-password");
+      } else {
+        // redirect user to specified redirect url or root of app
+        redirect(next);
+      }
     } else {
       // redirect the user to an error page with some instructions
       redirect(`/auth/error?error=${error?.message}`);
@@ -26,5 +31,5 @@ export async function GET(request: NextRequest) {
   }
 
   // redirect the user to an error page with some instructions
-  redirect(`/auth/error?error=No token hash or type`);
+  redirect(`/auth/error?error=no token hash or type`);
 }
