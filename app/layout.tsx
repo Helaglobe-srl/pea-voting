@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
-import ChatWidget from "@/components/chat";
+//import ChatWidget from "@/components/chat";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -40,7 +40,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
-          <ChatWidget />
+          {/* <ChatWidget /> */}
         </ThemeProvider>
       </body>
     </html>
