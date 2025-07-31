@@ -128,13 +128,15 @@ export default function ProjectVotingForm({ projectId, criteria, existingVotes, 
         </div>
       )}
 
-      <Button 
-        onClick={handleSubmit} 
-        disabled={isSubmitting}
-        className="mt-2 w-full sm:w-auto sm:self-start text-base py-3"
-      >
-        {isSubmitting ? "invio in corso..." : "invia voti"}
-      </Button>
+      <div className="flex justify-center">
+        <Button 
+          onClick={handleSubmit} 
+          disabled={isSubmitting}
+          className="mt-2 w-full sm:w-auto text-base py-3"
+        >
+          {isSubmitting ? "invio in corso..." : "Inserisci voti"}
+        </Button>
+      </div>
     </div>
   );
 } 

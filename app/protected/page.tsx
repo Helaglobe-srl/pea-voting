@@ -90,16 +90,16 @@ export default async function ProtectedPage({ searchParams }: { searchParams: Pr
   return (
     <div className="flex-1 w-full flex flex-col gap-12">
       <div className="w-full">
-        <div className="pea-gradient rounded-xl p-6 text-white shadow-lg">
+        <div className="pea-gradient rounded-xl p-6 shadow-lg">
           <div className="flex items-center gap-4 mb-3">
-            <div className="bg-white/20 rounded-full p-2">
-              <UserIcon size="24" strokeWidth={2} />
+            <div className="bg-white/20 dark:bg-black/20 rounded-full p-2">
+              <UserIcon size="24" strokeWidth={2} className="text-white dark:text-gray-800" />
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold">
+            <h1 className="text-xl sm:text-2xl font-bold text-white dark:text-gray-800">
               Benvenuto nella piattaforma di votazione del PEA
             </h1>
           </div>
-          <p className="text-white/90 text-sm sm:text-base">
+          <p className="text-white/90 dark:text-gray-700 text-sm sm:text-base">
             Vota i progetti per il patient engagement award e contribuisci a premiare le migliori iniziative per il coinvolgimento dei pazienti
           </p>
         </div>
