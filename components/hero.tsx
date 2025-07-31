@@ -1,11 +1,23 @@
 export function Hero() {
   return (
     <div className="flex flex-col gap-16 items-center">
-      <h1 className="text-4xl lg:text-5xl font-bold text-center">Piattaforma di Votazione - Patient Engagement Award</h1>
-      <p className="text-xl lg:text-2xl !leading-tight mx-auto max-w-2xl text-center">
-        Vota per le iniziative di engagement del paziente
+      <div className="text-center space-y-6">
+        <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold">
+          <span className="pea-hero-text">
+            Patient Engagement Award
+          </span>
+        </h1>
+        <h2 className="text-2xl lg:text-3xl font-semibold text-muted-foreground">
+          Piattaforma di Votazione
+        </h2>
+      </div>
+      <p className="text-xl lg:text-2xl !leading-tight mx-auto max-w-3xl text-center text-muted-foreground">
+        Partecipa alla valutazione delle migliori iniziative di engagement del paziente. 
+        La tua voce conta per riconoscere l'eccellenza nell'assistenza sanitaria.
       </p>
-      <div className="w-full p-[1px] bg-gradient-to-r from-transparent via-foreground/10 to-transparent my-8" />
+      <div className="w-full max-w-2xl mx-auto">
+        <div className="h-1 pea-gradient rounded-full" />
+      </div>
     </div>
   );
 }

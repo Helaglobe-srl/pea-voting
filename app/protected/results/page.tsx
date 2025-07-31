@@ -117,13 +117,12 @@ export default async function ResultsPage() {
     <div className="flex-1 w-full flex flex-col gap-8">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">voting results</h1>
-          <p className="text-sm text-muted-foreground mt-1">admin access only - normal users data</p>
+          <h1 className="text-3xl font-bold">Risultati della votazione</h1>
         </div>
         <Button asChild variant="outline">
           <Link href="/protected/admin" className="flex items-center gap-2">
             <ArrowLeftIcon size={16} />
-            back to dashboard
+            torna al dashboard
           </Link>
         </Button>
       </div>
@@ -131,15 +130,15 @@ export default async function ResultsPage() {
       <div className="bg-accent p-4 rounded-md flex items-center gap-3">
         <ChartBarIcon size={20} />
         <div>
-          <span className="font-medium">normal users participated: </span>
-          <span>{uniqueVoterCount} voter{uniqueVoterCount !== 1 ? 's' : ''}</span>
-          <span className="text-muted-foreground ml-2">({normalUserVotes.length} total votes)</span>
+          <span className="font-medium">Giurati votanti: </span>
+          <span>{uniqueVoterCount}</span>
+          <span className="text-muted-foreground ml-2">({normalUserVotes.length} voti totali)</span>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-8">
         {projectResults.map(({ project, criteriaResults, overallAverage }, index) => (
-          <Card key={project.id} className="p-6">
+          <Card key={project.id} className="p-6 pea-card-hover">
             <div className="flex justify-between items-start mb-4">
               <h2 className="text-xl font-bold">{index + 1}. {project.name}</h2>
               <div className="text-xl font-bold">
@@ -163,13 +162,13 @@ export default async function ResultsPage() {
                     <span className="text-sm">
                       {result.averageScore} <span className="text-xs text-muted-foreground">/ 5</span>
                       <span className="text-xs text-muted-foreground ml-2">
-                        ({result.voteCount} vote{result.voteCount !== 1 ? 's' : ''})
+                        ({result.voteCount} vot{result.voteCount !== 1 ? 'i' : 'o'})
                       </span>
                     </span>
                   </div>
                   <div className="w-full bg-muted rounded-full h-2">
                     <div 
-                      className="bg-primary h-2 rounded-full" 
+                      className="bg-accent h-2 rounded-full transition-all duration-300" 
                       style={{ width: `${(result.averageScore / 5) * 100}%` }}
                     ></div>
                   </div>
@@ -180,9 +179,6 @@ export default async function ResultsPage() {
         ))}
       </div>
 
-      <div className="text-xs text-muted-foreground">
-        note: this view shows data from normal users only. admin votes are excluded from all calculations.
-      </div>
     </div>
   );
 } 

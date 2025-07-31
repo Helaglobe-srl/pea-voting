@@ -117,7 +117,7 @@ export default async function ProtectedPage({ searchParams }: { searchParams: Pr
             const hasVoted = hasCompletedVoting(project.id);
             
             return (
-              <Card key={project.id} className="flex flex-col overflow-hidden border rounded-lg relative">
+              <Card key={project.id} className="flex flex-col overflow-hidden rounded-lg relative pea-card-hover">
                 {hasVoted && (
                   <div className="absolute top-3 right-3 z-10">
                     <div className="bg-green-500 rounded-full p-1 shadow-md">

@@ -5,56 +5,56 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
+    --foreground: 177 50% 25%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
+    --card-foreground: 177 50% 25%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
+    --popover-foreground: 177 50% 25%;
+    --primary: 177 50% 25%;
     --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
+    --secondary: 52 92% 85%;
+    --secondary-foreground: 177 50% 25%;
     --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
+    --muted-foreground: 177 30% 35%;
+    --accent: 52 92% 66%;
+    --accent-foreground: 177 50% 25%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --border: 177 20% 85%;
+    --input: 177 20% 90%;
+    --ring: 177 50% 25%;
+    --chart-1: 52 92% 66%;
+    --chart-2: 177 50% 40%;
+    --chart-3: 177 40% 30%;
+    --chart-4: 52 80% 75%;
+    --chart-5: 177 60% 50%;
     --radius: 0.5rem;
   }
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --background: 177 50% 8%;
+    --foreground: 52 92% 90%;
+    --card: 177 50% 10%;
+    --card-foreground: 52 92% 90%;
+    --popover: 177 50% 10%;
+    --popover-foreground: 52 92% 90%;
+    --primary: 52 92% 66%;
+    --primary-foreground: 177 50% 15%;
+    --secondary: 177 30% 20%;
+    --secondary-foreground: 52 92% 90%;
+    --muted: 177 30% 15%;
+    --muted-foreground: 52 60% 70%;
+    --accent: 52 92% 66%;
+    --accent-foreground: 177 50% 15%;
+    --destructive: 0 62.8% 50%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --border: 177 30% 25%;
+    --input: 177 30% 20%;
+    --ring: 52 92% 66%;
+    --chart-1: 52 92% 66%;
+    --chart-2: 177 50% 55%;
+    --chart-3: 177 40% 45%;
+    --chart-4: 52 80% 75%;
+    --chart-5: 177 60% 65%;
   }
 }
 
@@ -64,5 +64,30 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  /* custom patient engagement award branding styles */
+  .pea-gradient {
+    background: linear-gradient(135deg, hsl(var(--accent)) 0%, hsl(var(--primary)) 100%);
+  }
+  
+  .pea-hero-text {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .pea-card-hover {
+    transition: all 0.3s ease;
+    border: 1px solid hsl(var(--border));
+  }
+  
+  .pea-card-hover:hover {
+    border-color: hsl(var(--accent));
+    box-shadow: 0 4px 20px hsla(var(--accent), 0.15);
+    transform: translateY(-2px);
   }
 }

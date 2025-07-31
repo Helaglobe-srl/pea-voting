@@ -54,6 +54,13 @@ export default async function AdminDashboard() {
     email: email
   }));
   
+  // Calculate number of users who have voted at least 1 project (Giurati Votanti)
+  const usersWhoVoted = new Set<string>();
+  regularUserVotes.forEach(vote => {
+    usersWhoVoted.add(vote.user_id);
+  });
+  const giuratiVotanti = usersWhoVoted.size;
+  
   // Fetch projects and criteria
   const { data: projects } = await supabase.from("projects").select("*").order("id");
 
@@ -103,29 +110,29 @@ export default async function AdminDashboard() {
     <div className="flex-1 w-full flex flex-col gap-8">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold">🛠️ admin dashboard</h1>
-          <p className="text-sm sm:text-base text-muted-foreground">comprehensive voting overview (normal users only)</p>
+          <h1 className="text-2xl sm:text-3xl font-bold">🛠️ Pannello amministratore</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">Panoramica completa delle votazioni</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
           <Button asChild variant="outline" size="sm" className="flex-1 sm:flex-none">
             <Link href="/protected/admin/upload" className="flex items-center justify-center gap-2">
               <UploadIcon size={16} />
-              <span className="hidden xs:inline">upload excel</span>
-              <span className="xs:hidden">upload</span>
+              <span className="hidden xs:inline">carica excel</span>
+              <span className="xs:hidden">carica</span>
             </Link>
           </Button>
           <Button asChild variant="outline" size="sm" className="flex-1 sm:flex-none">
             <Link href="/protected/results" className="flex items-center justify-center gap-2">
               <BarChart3Icon size={16} />
-              <span className="hidden xs:inline">detailed results</span>
-              <span className="xs:hidden">results</span>
+              <span className="hidden xs:inline">risultati dettagliati</span>
+              <span className="xs:hidden">risultati</span>
             </Link>
           </Button>
           <Button asChild variant="outline" size="sm" className="flex-1 sm:flex-none">
             <Link href="/protected/profile" className="flex items-center justify-center gap-2">
               <ArrowLeftIcon size={16} />
-              <span className="hidden xs:inline">profile</span>
-              <span className="xs:hidden">back</span>
+              <span className="hidden xs:inline">profilo</span>
+              <span className="xs:hidden">indietro</span>
             </Link>
           </Button>
         </div>
@@ -137,7 +144,7 @@ export default async function AdminDashboard() {
           <div className="flex items-center gap-3">
             <UsersIcon className="h-8 w-8 text-blue-500" />
             <div>
-              <p className="text-sm text-muted-foreground">normal users</p>
+              <p className="text-sm text-muted-foreground">Giurati totali</p>
               <p className="text-2xl font-bold">{regularUsers.length}</p>
             </div>
           </div>
@@ -146,8 +153,8 @@ export default async function AdminDashboard() {
           <div className="flex items-center gap-3">
             <BarChart3Icon className="h-8 w-8 text-green-500" />
             <div>
-              <p className="text-sm text-muted-foreground">total votes</p>
-              <p className="text-2xl font-bold">{regularUserVotes.length}</p>
+              <p className="text-sm text-muted-foreground">Giurati votanti</p>
+              <p className="text-2xl font-bold">{giuratiVotanti}</p>
             </div>
           </div>
         </Card>
@@ -157,7 +164,7 @@ export default async function AdminDashboard() {
               P
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">projects</p>
+              <p className="text-sm text-muted-foreground">Progetti totali</p>
               <p className="text-2xl font-bold">{projects?.length || 0}</p>
             </div>
           </div>
@@ -166,7 +173,7 @@ export default async function AdminDashboard() {
 
       {/* Voting Matrix Table */}
       <Card className="p-6">
-        <h2 className="text-xl font-semibold mb-6">📊 voting matrix - average scores per user</h2>
+        <h2 className="text-xl font-semibold mb-6">📊 Matrice dei voti</h2>
         
         {/* Mobile-first responsive table */}
         <div className="block lg:hidden">
@@ -206,7 +213,7 @@ export default async function AdminDashboard() {
                       })}
                     </div>
                     <div className="text-right text-sm font-bold border-t pt-2">
-                      User Average: {userAverage > 0 ? userAverage : '-'}
+                      Media Utente: {userAverage > 0 ? userAverage : '-'}
                     </div>
                   </div>
                 </Card>
@@ -220,13 +227,13 @@ export default async function AdminDashboard() {
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="bg-muted">
-                <th className="p-3 text-left border">user email</th>
+                <th className="p-3 text-left border">email utente</th>
                 {projects?.map(project => (
                   <th key={project.id} className="p-3 text-center border min-w-[120px]">
                     {project.name}
                   </th>
                 ))}
-                <th className="p-3 text-center border">user average</th>
+                <th className="p-3 text-center border">media utente</th>
               </tr>
             </thead>
             <tbody>
@@ -265,7 +272,7 @@ export default async function AdminDashboard() {
               })}
               {/* Project averages row */}
               <tr className="bg-muted font-bold">
-                <td className="p-3 border">project averages</td>
+                <td className="p-3 border">medie progetti</td>
                 {projects?.map(project => {
                   const projectAvg = getProjectAverage(project.id);
                   return (
@@ -288,30 +295,27 @@ export default async function AdminDashboard() {
 
       {/* Legend */}
       <Card className="p-4">
-        <h3 className="font-semibold mb-3">🎨 score legend</h3>
+                        <h3 className="font-semibold mb-3">🎨 legenda punteggi</h3>
         <div className="flex gap-4 text-xs">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-green-500 rounded"></div>
-            <span>4.0-5.0 (excellent)</span>
+            <span>4.0-5.0 (eccellente)</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-yellow-500 rounded"></div>
-            <span>3.0-3.9 (good)</span>
+            <span>3.0-3.9 (buono)</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-orange-500 rounded"></div>
-            <span>2.0-2.9 (fair)</span>
+            <span>2.0-2.9 (discreto)</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-red-500 rounded"></div>
-            <span>1.0-1.9 (poor)</span>
+            <span>1.0-1.9 (scarso)</span>
           </div>
         </div>
       </Card>
 
-      <div className="text-xs text-muted-foreground">
-        note: admin votes are excluded from this view. only votes from normal users are displayed.
-      </div>
     </div>
   );
 } 
