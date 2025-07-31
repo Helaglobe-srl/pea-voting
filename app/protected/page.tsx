@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { InfoIcon, UserIcon, AlertCircleIcon, CheckCircleIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { UserIcon, AlertCircleIcon, CheckCircleIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
