@@ -5,18 +5,32 @@ import { NavLinks } from "@/components/nav-links";
 import { hasEnvVars } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";
+import { createClient } from "@/lib/supabase/server";
 
-export default function ProtectedLayout({
+export default async function ProtectedLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // check if user is admin to determine logo link destination
+  const supabase = await createClient();
+  const { data: sessionData } = await supabase.auth.getSession();
+  
+  let logoHref = "/protected"; // default to regular user dashboard
+  if (sessionData.session) {
+    const userEmail = sessionData.session.user.email;
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const isAdmin = adminEmail && userEmail === adminEmail;
+    if (isAdmin) {
+      logoHref = "/protected/admin";
+    }
+  }
   return (
     <main className="min-h-screen flex flex-col items-center">
       <div className="flex-1 w-full flex flex-col gap-20 items-center">
         <nav className="w-full flex justify-center border-b border-b-border h-16 bg-background/80 backdrop-blur-md">
           <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
-            <Link href={"/"} className="hover:opacity-80 transition-opacity">
+            <Link href={logoHref} className="hover:opacity-80 transition-opacity">
               <Image
                 src="/pea-logo.png"
                 alt="Patient Engagement Award"

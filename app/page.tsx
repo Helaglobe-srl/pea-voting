@@ -6,8 +6,30 @@ import { NavLinks } from "@/components/nav-links";
 import { hasEnvVars } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 
-export default function Home() {
+export default async function Home() {
+  // check authentication status and redirect authenticated users
+  const supabase = await createClient();
+  const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+  
+  if (!sessionError && sessionData.session) {
+    // user is authenticated, check if admin
+    const userEmail = sessionData.session.user.email;
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const isAdmin = adminEmail && userEmail === adminEmail;
+    
+    if (isAdmin) {
+      // redirect admin to admin dashboard
+      redirect("/protected/admin");
+    } else {
+      // redirect normal user to voting page
+      redirect("/protected");
+    }
+  }
+  
+  // user is not authenticated, show landing page
   return (
     <main className="min-h-screen flex flex-col items-center">
       <div className="flex-1 w-full flex flex-col gap-20 items-center">
