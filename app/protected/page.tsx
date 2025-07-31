@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { InfoIcon, UserIcon, AlertCircleIcon, CheckCircleIcon } from "lucide-react";
+import { InfoIcon, UserIcon, AlertCircleIcon, CheckCircleIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -11,11 +11,15 @@ const truncateText = (text: string, maxLength: number = 150): string => {
   return text.slice(0, maxLength) + "...";
 };
 
-export default async function ProtectedPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+export default async function ProtectedPage({ searchParams }: { searchParams: Promise<{ error?: string; page?: string }> }) {
   const supabase = await createClient();
   
   // await searchParams in Next.js 15+
   const params = await searchParams;
+  
+  // pagination setup
+  const currentPage = parseInt(params.page || '1', 10);
+  const projectsPerPage = 9;
 
   const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
   if (sessionError || !sessionData.session) {
@@ -76,12 +80,28 @@ export default async function ProtectedPage({ searchParams }: { searchParams: Pr
     return projectVotes.length === totalCriteria;
   };
 
+  // pagination calculations
+  const totalProjects = projects?.length || 0;
+  const totalPages = Math.ceil(totalProjects / projectsPerPage);
+  const startIndex = (currentPage - 1) * projectsPerPage;
+  const endIndex = startIndex + projectsPerPage;
+  const currentProjects = projects?.slice(startIndex, endIndex) || [];
+
   return (
     <div className="flex-1 w-full flex flex-col gap-12">
       <div className="w-full">
-        <div className="bg-accent text-sm p-3 px-5 rounded-md text-foreground flex gap-3 items-center">
-          <InfoIcon size="16" strokeWidth={2} />
-          benvenuto nella piattaforma di votazione per l&apos;engagement dei pazienti
+        <div className="pea-gradient rounded-xl p-6 text-white shadow-lg">
+          <div className="flex items-center gap-4 mb-3">
+            <div className="bg-white/20 rounded-full p-2">
+              <UserIcon size="24" strokeWidth={2} />
+            </div>
+            <h1 className="text-xl sm:text-2xl font-bold">
+              Benvenuto nella piattaforma di votazione del PEA
+            </h1>
+          </div>
+          <p className="text-white/90 text-sm sm:text-base">
+            Vota i progetti per il patient engagement award e contribuisci a premiare le migliori iniziative per il coinvolgimento dei pazienti
+          </p>
         </div>
       </div>
 
@@ -95,29 +115,44 @@ export default async function ProtectedPage({ searchParams }: { searchParams: Pr
       )}
       
       <div className="flex flex-col gap-6">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center w-full gap-4">
-          <h2 className="font-bold text-xl sm:text-2xl">progetti disponibili per la votazione</h2>
-          <div className="flex gap-3">
-            <Button asChild variant="outline" size="sm" className="flex-1 sm:flex-none">
-              <Link href="/protected/profile" className="flex items-center justify-center gap-2">
-                <UserIcon size={16} />
-                <span className="hidden xs:inline">visualizza profilo</span>
-                <span className="xs:hidden">profilo</span>
-              </Link>
-            </Button>
+        <div className="bg-card border rounded-xl p-6 shadow-sm">
+          <div className="flex flex-col gap-4">
+            <h2 className="font-bold text-xl sm:text-2xl border-b pb-3">Progetti disponibili per la votazione</h2>
+            
+            <div className="flex flex-col md:flex-row gap-6">
+              <div className="flex-1">
+                <p className="text-base font-medium mb-2">Seleziona un progetto e valutalo secondo i criteri:</p>
+                <ul className="space-y-2 text-muted-foreground">
+                  <li className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-primary"></div>
+                    <span>Conformità rispetto al bisogno</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-primary"></div>
+                    <span>Scalabilità</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-primary"></div>
+                    <span>Impatto sociale</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div className="flex-1 flex items-center">
+                <p className="text-sm text-muted-foreground italic">
+                  Puoi modificare il tuo voto in qualsiasi momento.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
         
-        <p className="text-muted-foreground">
-          seleziona un progetto per votare sui seguenti criteri: conformità rispetto al bisogno, scalabilità e impatto sociale.
-        </p>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-4">
-          {projects && projects.map((project, index) => {
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-4 auto-rows-fr">
+          {currentProjects && currentProjects.map((project, index) => {
             const hasVoted = hasCompletedVoting(project.id);
             
             return (
-              <Card key={project.id} className="flex flex-col overflow-hidden rounded-lg relative pea-card-hover">
+              <Card key={project.id} className="flex flex-col overflow-hidden rounded-lg relative pea-card-hover h-full">
                 {hasVoted && (
                   <div className="absolute top-3 right-3 z-10">
                     <div className="bg-green-500 rounded-full p-1 shadow-md">
@@ -125,10 +160,10 @@ export default async function ProtectedPage({ searchParams }: { searchParams: Pr
                     </div>
                   </div>
                 )}
-                <div className="p-4 sm:p-6 flex flex-col gap-3 sm:gap-4">
+                <div className="p-4 sm:p-6 flex flex-col gap-3 sm:gap-4 h-full">
                   <div className="flex items-start gap-3">
                     <div className="flex-grow">
-                      <h3 className="text-lg sm:text-xl font-bold leading-tight">{index + 1}. {project.name}</h3>
+                      <h3 className="text-lg sm:text-xl font-bold leading-tight">{startIndex + index + 1}. {project.name}</h3>
                       {hasVoted && (
                         <p className="text-xs sm:text-sm text-green-600 dark:text-green-400 mt-1 font-medium">
                           ✓ votazione completata
@@ -144,16 +179,84 @@ export default async function ProtectedPage({ searchParams }: { searchParams: Pr
                       120
                     )}
                   </p>
-                  <Button asChild className="w-full mt-3 sm:mt-4 text-sm sm:text-base" variant={hasVoted ? "outline" : "default"}>
-                    <Link href={`/protected/vote/${project.id}`}>
-                      {hasVoted ? "aggiorna il tuo voto" : "vota questo progetto"}
-                    </Link>
-                  </Button>
+                  <div className="mt-auto">
+                    <Button asChild className="w-full mt-3 sm:mt-4 text-sm sm:text-base" variant={hasVoted ? "outline" : "default"}>
+                      <Link href={`/protected/vote/${project.id}`}>
+                        {hasVoted ? "aggiorna il tuo voto" : "vota questo progetto"}
+                      </Link>
+                    </Button>
+                  </div>
                 </div>
               </Card>
             );
           })}
         </div>
+
+        {/* pagination controls */}
+        {totalPages > 1 && (
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8">
+            <div className="text-sm text-muted-foreground">
+              mostrando {startIndex + 1}-{Math.min(endIndex, totalProjects)} di {totalProjects} progetti
+            </div>
+            
+            <div className="flex items-center gap-2">
+              {/* previous button */}
+              {currentPage > 1 && (
+                <Link href={`/protected?page=${currentPage - 1}`}>
+                  <Button variant="outline" size="sm">
+                    <ChevronLeftIcon className="h-4 w-4" />
+                    precedente
+                  </Button>
+                </Link>
+              )}
+              
+              {/* page numbers */}
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
+                  const isCurrentPage = pageNum === currentPage;
+                  
+                  // show first page, last page, current page, and pages around current
+                  const showPage = pageNum === 1 || 
+                                 pageNum === totalPages || 
+                                 Math.abs(pageNum - currentPage) <= 1;
+                  
+                  if (!showPage) {
+                    // show ellipsis
+                    if (pageNum === 2 && currentPage > 4) {
+                      return <span key={pageNum} className="px-2 text-muted-foreground">...</span>;
+                    }
+                    if (pageNum === totalPages - 1 && currentPage < totalPages - 3) {
+                      return <span key={pageNum} className="px-2 text-muted-foreground">...</span>;
+                    }
+                    return null;
+                  }
+                  
+                  return (
+                    <Link key={pageNum} href={`/protected?page=${pageNum}`}>
+                      <Button 
+                        variant={isCurrentPage ? "default" : "outline"} 
+                        size="sm"
+                        className="w-8 h-8 p-0"
+                      >
+                        {pageNum}
+                      </Button>
+                    </Link>
+                  );
+                })}
+              </div>
+              
+              {/* next button */}
+              {currentPage < totalPages && (
+                <Link href={`/protected?page=${currentPage + 1}`}>
+                  <Button variant="outline" size="sm">
+                    successiva
+                    <ChevronRightIcon className="h-4 w-4" />
+                  </Button>
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

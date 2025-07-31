@@ -65,7 +65,7 @@ export default async function VotePage({ params }: { params: Promise<{ id: strin
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">🎯 {project.name}</h1>
         <Button asChild variant="outline">
-          <Link href="/protected">← torna ai progetti</Link>
+          <Link href="/protected">← Torna ai progetti</Link>
         </Button>
       </div>
 
@@ -76,7 +76,7 @@ export default async function VotePage({ params }: { params: Promise<{ id: strin
           {projectDetails.jury_info && (
             <Card className="p-6 border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800">
               <h2 className="text-xl font-semibold mb-4 text-blue-800 dark:text-blue-200">
-                ⚖️ informazioni per la giuria
+                ⚖️ Informazioni per la giuria
               </h2>
               <p className="text-blue-900 dark:text-blue-100 leading-relaxed">
                 {projectDetails.jury_info}
@@ -88,28 +88,28 @@ export default async function VotePage({ params }: { params: Promise<{ id: strin
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {projectDetails.organization_name && (
               <Card className="p-4">
-                <h3 className="font-semibold text-sm text-muted-foreground mb-2">🏢 organizzazione</h3>
+                <h3 className="font-semibold text-sm text-muted-foreground mb-2">🏢 Organizzazione</h3>
                 <p className="font-medium">{projectDetails.organization_name}</p>
               </Card>
             )}
 
             {projectDetails.organization_type && (
               <Card className="p-4">
-                <h3 className="font-semibold text-sm text-muted-foreground mb-2">🏷️ tipo di organizzazione</h3>
+                <h3 className="font-semibold text-sm text-muted-foreground mb-2">🏷️ Tipo di organizzazione</h3>
                 <p className="font-medium">{projectDetails.organization_type}</p>
               </Card>
             )}
 
             {projectDetails.project_category && (
               <Card className="p-4">
-                <h3 className="font-semibold text-sm text-muted-foreground mb-2">📂 categoria</h3>
+                <h3 className="font-semibold text-sm text-muted-foreground mb-2">📂 Categoria</h3>
                 <p className="font-medium">{projectDetails.project_category}</p>
               </Card>
             )}
 
             {projectDetails.therapeutic_area && (
               <Card className="p-4">
-                <h3 className="font-semibold text-sm text-muted-foreground mb-2">🩺 area terapeutica</h3>
+                <h3 className="font-semibold text-sm text-muted-foreground mb-2">🩺 Area terapeutica</h3>
                 <p className="font-medium">{projectDetails.therapeutic_area}</p>
               </Card>
             )}
@@ -120,7 +120,7 @@ export default async function VotePage({ params }: { params: Promise<{ id: strin
           {/* Objectives and Results */}
           {projectDetails.objectives_results && (
             <Card className="p-6">
-              <h3 className="font-semibold text-lg mb-4">🎯 obiettivi e risultati</h3>
+              <h3 className="font-semibold text-lg mb-4">🎯 Obiettivi e risultati</h3>
               <p className="text-muted-foreground leading-relaxed">
                 {projectDetails.objectives_results}
               </p>
@@ -132,14 +132,14 @@ export default async function VotePage({ params }: { params: Promise<{ id: strin
           {/* Presentation Link */}
           {projectDetails.presentation_link && (
             <Card className="p-6">
-              <h3 className="font-semibold text-lg mb-4">📊 presentazione</h3>
+              <h3 className="font-semibold text-lg mb-4">📊 Presentazione</h3>
               <a 
                 href={projectDetails.presentation_link} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline flex items-center gap-2"
               >
-                🔗 visualizza presentazione del progetto →
+                🔗 Visualizza presentazione del progetto →
               </a>
             </Card>
           )}
@@ -148,12 +148,12 @@ export default async function VotePage({ params }: { params: Promise<{ id: strin
 
       {/* Fallback for projects without detailed information */}
       {!projectDetails && (
-        <p className="text-lg text-muted-foreground">📝 nessuna descrizione disponibile</p>
+        <p className="text-lg text-muted-foreground">📝 Nessuna descrizione disponibile</p>
       )}
 
       {/* Voting Section */}
       <Card className="p-6">
-        <h2 className="text-xl font-semibold mb-6">🗳️ vota questo progetto</h2>
+        <h2 className="text-xl font-semibold mb-6">🗳️ Vota questo progetto</h2>
         <ProjectVotingForm 
           projectId={projectId} 
           criteria={criteria || []} 
