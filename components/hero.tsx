@@ -1,7 +1,19 @@
+import Image from "next/image";
+
 export function Hero() {
   return (
     <div className="flex flex-col gap-16 items-center">
       <div className="text-center space-y-6">
+        <div className="flex justify-center mb-6">
+          <Image
+            src="/pea-logo.png"
+            alt="Patient Engagement Award"
+            width={340}
+            height={180}
+            className="h-auto w-auto"
+            priority
+          />
+        </div>
         <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold">
           <span className="pea-hero-text">
             Patient Engagement Award
