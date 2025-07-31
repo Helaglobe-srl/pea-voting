@@ -20,20 +20,34 @@ export function UpdatePasswordForm({
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+
+    // check if passwords match before proceeding
+    if (password !== confirmPassword) {
+      setError("Le password non corrispondono");
+      return;
+    }
+
+    // check password length (basic validation)
+    if (password.length < 6) {
+      setError("La password deve essere di almeno 6 caratteri");
+      return;
+    }
+
     const supabase = createClient();
     setIsLoading(true);
-    setError(null);
 
     try {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
-      // Update this route to redirect to an authenticated route. The user already has an active session.
+      // update this route to redirect to an authenticated route. the user already has an active session.
       router.push("/protected");
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "Si è verificato un errore");
@@ -63,6 +77,17 @@ export function UpdatePasswordForm({
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="confirmPassword">Conferma nuova password</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="Conferma nuova password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                 />
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
