@@ -40,15 +40,20 @@ export function SignUpForm({
     }
 
     try {
+      // create account and send otp in one call
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `https://pea-voting.vercel.app/auth/confirm?next=/protected`,
+          // this will send an otp code for email verification
+          emailRedirectTo: `${window.location.origin}/auth/verify-otp?email=${encodeURIComponent(email)}&type=signup`,
         },
       });
+
       if (error) throw error;
-      router.push("/auth/sign-up-success");
+
+      // redirect to otp verification page
+      router.push(`/auth/verify-otp?email=${encodeURIComponent(email)}&type=signup`);
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "Si è verificato un errore");
     } finally {
