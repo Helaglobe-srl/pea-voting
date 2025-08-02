@@ -176,7 +176,7 @@ export default function VerifyOTPPage() {
                 </div>
 
                 <div className="text-xs text-muted-foreground text-center">
-                  <p>Non hai ricevuto l'email? Controlla la cartella spam.</p>
+                  <p>Non hai ricevuto l&apos;email? Controlla la cartella spam.</p>
                   <p>Il codice scade tra 10 minuti.</p>
                 </div>
               </div>
