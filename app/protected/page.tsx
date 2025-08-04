@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { UserIcon, AlertCircleIcon, CheckCircleIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { UserIcon, AlertCircleIcon, CheckCircleIcon, ChevronLeftIcon, ChevronRightIcon, InfoIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -194,26 +194,36 @@ export default async function ProtectedPage({ searchParams }: { searchParams: Pr
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-1">
                 <p className="text-base font-medium mb-2">Seleziona un progetto e valutalo secondo i criteri:</p>
-                <ul className="space-y-2 text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-primary"></div>
-                    <span>Conformità rispetto al bisogno</span>
+                <ul className="space-y-3 text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <div className="h-2 w-2 rounded-full bg-primary mt-2 flex-shrink-0"></div>
+                    <div>
+                      <span className="font-medium">Conformità rispetto al bisogno:</span>
+                      <p className="text-sm mt-1">Il grado di appropriatezza con cui le azioni di progetto hanno risposto al bisogno che il progetto stesso mira a soddisfare</p>
+                    </div>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-primary"></div>
-                    <span>Scalabilità</span>
+                  <li className="flex items-start gap-2">
+                    <div className="h-2 w-2 rounded-full bg-primary mt-2 flex-shrink-0"></div>
+                    <div>
+                      <span className="font-medium">Scalabilità:</span>
+                      <p className="text-sm mt-1">La possibilità di replicare in maniera esponenziale, di espandere, il progetto senza dover sostenere ulteriori importanti investimenti</p>
+                    </div>
                   </li>
-                  <li className="flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-primary"></div>
-                    <span>Impatto sociale</span>
+                  <li className="flex items-start gap-2">
+                    <div className="h-2 w-2 rounded-full bg-primary mt-2 flex-shrink-0"></div>
+                    <div>
+                      <span className="font-medium">Impatto sociale:</span>
+                      <p className="text-sm mt-1">La capacità, del progetto, di aver generato un risultato positivo nella vita delle persone con patologia e dei caregiver, dal miglioramento della qualità di vita alla soluzione di problemi</p>
+                    </div>
                   </li>
                 </ul>
-              </div>
-              
-              <div className="flex-1 flex items-center">
-                <p className="text-sm text-muted-foreground italic">
-                  Puoi modificare il tuo voto in qualsiasi momento.
-                </p>
+                
+                <div className="flex items-center gap-2 mt-4 p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
+                  <InfoIcon size="16" className="text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                  <p className="text-sm text-blue-600 dark:text-blue-400">
+                    Puoi modificare il tuo voto in qualsiasi momento.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
