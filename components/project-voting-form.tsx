@@ -141,7 +141,7 @@ export default function ProjectVotingForm({ projectId, criteria, existingVotes, 
       ))}
 
       {message && (
-        <div className={`p-3 rounded-md text-sm ${message.includes("successo") ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" : "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200"}`}>
+        <div className={`p-3 rounded-md text-sm ${message.includes("successo") ? "bg-[#ffea1d]/20 text-[#04516f] dark:bg-[#ffea1d]/30 dark:text-[#04516f]" : "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200"}`}>
           {message}
         </div>
       )}

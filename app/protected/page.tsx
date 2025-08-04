@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { UserIcon, AlertCircleIcon, CheckCircleIcon, ChevronLeftIcon, ChevronRightIcon, InfoIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -89,16 +90,26 @@ export default async function ProtectedPage({ searchParams }: { searchParams: Pr
   return (
     <div className="flex-1 w-full flex flex-col gap-12">
       <div className="w-full">
-        <div className="pea-gradient rounded-xl p-6 shadow-lg">
-          <div className="flex items-center gap-4 mb-3">
-            <div className="bg-white/20 dark:bg-black/20 rounded-full p-2">
-              <UserIcon size="24" strokeWidth={2} className="text-white dark:text-gray-800" />
+        <div className="bg-[#04516f] rounded-xl p-6 shadow-lg">
+          <div className="flex flex-col items-center text-center mb-4">
+            <Image
+              src="/pea-banner.png"
+              alt="Patient Engagement Award"
+              width={420}
+              height={200}
+              className="h-48 w-auto mb-4"
+              priority
+            />
+            <div className="flex items-center gap-4">
+              <div className="bg-white/20 rounded-full p-2">
+                <UserIcon size="24" strokeWidth={2} className="text-white" />
+              </div>
+              <h1 className="text-xl sm:text-2xl font-bold text-white">
+                Benvenuto nella piattaforma di votazione del Patient Engagement Award
+              </h1>
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold text-white dark:text-gray-800">
-              Benvenuto nella piattaforma di votazione del Patient Engagement Award
-            </h1>
           </div>
-          <p className="text-white/90 dark:text-gray-700 text-sm sm:text-base">
+          <p className="text-white/90 text-sm sm:text-base text-center">
             Vota i progetti per il Patient Engagement Award e contribuisci a premiare le migliori iniziative per il coinvolgimento dei pazienti
           </p>
         </div>
@@ -128,7 +139,7 @@ export default async function ProtectedPage({ searchParams }: { searchParams: Pr
                 </div>
                 <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
                   <div 
-                    className="h-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-300 ease-in-out"
+                    className="h-full bg-gradient-to-r from-[#04516f] to-[#033d5a] dark:from-[#6ba3c7] dark:to-[#8bb8d4] transition-all duration-300 ease-in-out"
                     style={{ width: `${progressPercentage}%` }}
                   ></div>
                 </div>
@@ -136,23 +147,23 @@ export default async function ProtectedPage({ searchParams }: { searchParams: Pr
 
               {/* statistics */}
               <div className="flex flex-col sm:flex-row gap-4 lg:gap-6">
-                <div className="flex items-center gap-3 bg-green-50 dark:bg-green-950 p-3 rounded-lg">
-                  <div className="bg-green-500 rounded-full p-2">
-                    <CheckCircleIcon size="16" className="text-white" />
+                <div className="flex items-center gap-3 bg-[#ffea1d]/10 dark:bg-[#ffea1d]/20 p-3 rounded-lg">
+                  <div className="bg-[#ffea1d] rounded-full p-2">
+                    <CheckCircleIcon size="16" className="text-[#04516f]" />
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">{completedProjects}</div>
-                    <div className="text-xs text-green-600 dark:text-green-400 font-medium">progetti votati</div>
+                    <div className="text-2xl font-bold text-[#04516f] dark:text-[#6ba3c7]">{completedProjects}</div>
+                    <div className="text-xs text-[#04516f] dark:text-[#6ba3c7] font-medium">progetti votati</div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 bg-blue-50 dark:bg-blue-950 p-3 rounded-lg">
-                  <div className="bg-blue-500 rounded-full p-2">
+                <div className="flex items-center gap-3 bg-[#04516f]/10 dark:bg-[#04516f]/20 p-3 rounded-lg">
+                  <div className="bg-[#04516f] rounded-full p-2">
                     <div className="w-4 h-4 border-2 border-white rounded-full"></div>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{remainingProjects}</div>
-                    <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">progetti da votare</div>
+                    <div className="text-2xl font-bold text-[#04516f] dark:text-[#6ba3c7]">{remainingProjects}</div>
+                    <div className="text-xs text-[#04516f] dark:text-[#6ba3c7] font-medium">progetti da votare</div>
                   </div>
                 </div>
 
@@ -172,7 +183,7 @@ export default async function ProtectedPage({ searchParams }: { searchParams: Pr
             {completedProjects > 0 && (
               <div className="mt-2">
                 {completedProjects === totalProjects ? (
-                  <p className="text-sm text-green-600 dark:text-green-400 font-medium">
+                  <p className="text-sm text-[#04516f] dark:text-[#04516f] font-medium">
                     🎉 congratulazioni! hai completato la votazione di tutti i progetti.
                   </p>
                 ) : (

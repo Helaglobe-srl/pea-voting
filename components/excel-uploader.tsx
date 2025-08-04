@@ -110,7 +110,7 @@ export default function ExcelUploader() {
       ) : (
         <div className="w-full text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <FileSpreadsheetIcon className="h-8 w-8 text-blue-500" />
+            <FileSpreadsheetIcon className="h-8 w-8 text-[#04516f]" />
             <div>
               <p className="font-medium">{file.name}</p>
               <p className="text-sm text-muted-foreground">
@@ -122,10 +122,10 @@ export default function ExcelUploader() {
           {message && (
             <div className={`mb-4 p-3 rounded-md text-sm ${
               uploadStatus === 'success' 
-                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                ? 'bg-[#ffea1d]/20 text-[#04516f] dark:bg-[#ffea1d]/30 dark:text-[#04516f]'
                 : uploadStatus === 'error'
                 ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                : 'bg-[#04516f]/10 text-[#04516f] dark:bg-[#04516f]/20 dark:text-[#04516f]'
             }`}>
               <div className="flex items-center gap-2 justify-center">
                 {uploadStatus === 'success' && <CheckCircleIcon size={16} />}

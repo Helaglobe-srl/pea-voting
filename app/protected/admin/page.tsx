@@ -173,7 +173,7 @@ export default async function AdminDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <UsersIcon className="h-8 w-8 text-blue-500" />
+            <UsersIcon className="h-8 w-8 text-[#04516f]" />
             <div>
               <p className="text-sm text-muted-foreground">Giurati totali</p>
               <p className="text-2xl font-bold">{totalJurors}</p>
@@ -182,7 +182,7 @@ export default async function AdminDashboard() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <BarChart3Icon className="h-8 w-8 text-green-500" />
+            <BarChart3Icon className="h-8 w-8 text-[#ffea1d]" />
             <div>
               <p className="text-sm text-muted-foreground">Giurati votanti</p>
               <p className="text-2xl font-bold">{giuratiVotanti}</p>
@@ -191,7 +191,7 @@ export default async function AdminDashboard() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="h-8 w-8 bg-purple-500 rounded flex items-center justify-center text-white text-sm font-bold">
+            <div className="h-8 w-8 bg-[#04516f] rounded flex items-center justify-center text-white text-sm font-bold">
               P
             </div>
             <div>
@@ -229,7 +229,7 @@ export default async function AdminDashboard() {
                           return (
                             <div key={project.id} className="flex justify-between items-center p-2 bg-muted/50 rounded">
                               <Link href={`/protected/admin/project/${project.id}`} className="flex-1 min-w-0 hover:bg-muted/30 transition-colors rounded p-1">
-                                <div className="font-medium truncate text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline">
+                                <div className="font-medium truncate text-[#04516f] hover:text-[#033d5a] dark:text-[#6ba3c7] dark:hover:text-[#8bb8d4] underline">
                                   {project.name}
                                 </div>
                                 {project.organization_name && (
@@ -239,10 +239,10 @@ export default async function AdminDashboard() {
                                 )}
                               </Link>
                               {score !== null ? (
-                                <span className={`inline-block px-2 py-1 rounded text-white text-xs font-medium ml-2 flex-shrink-0 ${
-                                  score >= 4 ? 'bg-green-500' : 
-                                  score >= 3 ? 'bg-yellow-500' : 
-                                  score >= 2 ? 'bg-orange-500' : 'bg-red-500'
+                                <span className={`inline-block px-2 py-1 rounded text-xs font-medium ml-2 flex-shrink-0 ${
+                                  score >= 4 ? 'bg-[#04516f] text-white' : 
+                                  score >= 3 ? 'bg-[#ffea1d] text-[#04516f]' : 
+                                  score >= 2 ? 'bg-orange-500 text-white' : 'bg-red-500 text-white'
                                 }`}>
                                   {score}
                                 </span>
@@ -273,7 +273,7 @@ export default async function AdminDashboard() {
                     <th key={project.id} className="p-3 text-center border min-w-[150px]">
                       <Link href={`/protected/admin/project/${project.id}`} className="block hover:bg-muted/50 transition-colors rounded p-1">
                         <div className="flex flex-col gap-1">
-                          <div className="font-medium text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline">
+                          <div className="font-medium text-sm text-[#04516f] hover:text-[#033d5a] dark:text-[#6ba3c7] dark:hover:text-[#8bb8d4] underline">
                             {project.name}
                           </div>
                           {project.organization_name && (
@@ -303,10 +303,10 @@ export default async function AdminDashboard() {
                         return (
                           <td key={project.id} className="p-3 text-center border">
                             {score !== null ? (
-                              <span className={`inline-block px-2 py-1 rounded text-white text-xs font-medium ${
-                                score >= 4 ? 'bg-green-500' : 
-                                score >= 3 ? 'bg-yellow-500' : 
-                                score >= 2 ? 'bg-orange-500' : 'bg-red-500'
+                              <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                                score >= 4 ? 'bg-[#04516f] text-white' : 
+                                score >= 3 ? 'bg-[#ffea1d] text-[#04516f]' : 
+                                score >= 2 ? 'bg-orange-500 text-white' : 'bg-red-500 text-white'
                               }`}>
                                 {score}
                               </span>
@@ -351,11 +351,11 @@ export default async function AdminDashboard() {
                         <h3 className="font-semibold mb-3">🎨 Legenda punteggi</h3>
         <div className="flex gap-4 text-xs">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-green-500 rounded"></div>
+            <div className="w-4 h-4 bg-[#04516f] rounded"></div>
             <span>4.0-5.0 (eccellente)</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-yellow-500 rounded"></div>
+            <div className="w-4 h-4 bg-[#ffea1d] rounded"></div>
             <span>3.0-3.9 (buono)</span>
           </div>
           <div className="flex items-center gap-2">

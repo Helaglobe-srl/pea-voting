@@ -121,12 +121,12 @@ export default async function ResultsPage() {
         </Button>
       </div>
 
-      <div className="bg-accent p-4 rounded-md flex items-center gap-3">
-        <ChartBarIcon size={20} />
-        <div>
+      <div className="bg-[#ffea1d]/10 dark:bg-[#ffea1d] p-4 rounded-md flex items-center gap-3 border border-[#ffea1d]/20">
+        <ChartBarIcon size={20} className="text-[#04516f]" />
+        <div className="text-[#04516f]">
           <span className="font-medium">Giurati votanti: </span>
           <span>{uniqueVoterCount}</span>
-          <span className="text-muted-foreground ml-2">({normalUserVotes.length} voti totali)</span>
+          <span className="text-[#04516f]/70 ml-2">({normalUserVotes.length} voti totali)</span>
         </div>
       </div>
 
