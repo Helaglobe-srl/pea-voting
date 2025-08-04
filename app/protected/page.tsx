@@ -209,21 +209,21 @@ export default async function ProtectedPage({ searchParams }: { searchParams: Pr
                   <li className="flex items-start gap-2">
                     <div className="h-2 w-2 rounded-full bg-primary mt-2 flex-shrink-0"></div>
                     <div>
-                      <span className="font-medium">Conformità rispetto al bisogno:</span>
+                      <span className="font-bold">Conformità rispetto al bisogno:</span>
                       <p className="text-sm mt-1">Il grado di appropriatezza con cui le azioni di progetto hanno risposto al bisogno che il progetto stesso mira a soddisfare</p>
                     </div>
                   </li>
                   <li className="flex items-start gap-2">
                     <div className="h-2 w-2 rounded-full bg-primary mt-2 flex-shrink-0"></div>
                     <div>
-                      <span className="font-medium">Scalabilità:</span>
+                      <span className="font-bold">Scalabilità:</span>
                       <p className="text-sm mt-1">La possibilità di replicare in maniera esponenziale, di espandere, il progetto senza dover sostenere ulteriori importanti investimenti</p>
                     </div>
                   </li>
                   <li className="flex items-start gap-2">
                     <div className="h-2 w-2 rounded-full bg-primary mt-2 flex-shrink-0"></div>
                     <div>
-                      <span className="font-medium">Impatto sociale:</span>
+                      <span className="font-bold">Impatto sociale:</span>
                       <p className="text-sm mt-1">La capacità, del progetto, di aver generato un risultato positivo nella vita delle persone con patologia e dei caregiver, dal miglioramento della qualità di vita alla soluzione di problemi</p>
                     </div>
                   </li>

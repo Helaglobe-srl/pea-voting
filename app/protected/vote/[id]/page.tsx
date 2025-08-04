@@ -97,14 +97,14 @@ export default async function VotePage({ params }: { params: Promise<{ id: strin
       <div className="space-y-6">
         {/* Jury Information - Most Important */}
         {project.jury_info && (
-          <Card className="p-6 border-[#04516f]/20 bg-[#04516f]/5 dark:bg-[#04516f]/10 dark:border-[#04516f]/30">
-                          <h2 className="text-xl font-semibold mb-4 text-[#04516f] dark:text-[#04516f]">
-                ⚖️ Informazioni per la giuria
-              </h2>
-                          <p className="text-[#04516f] dark:text-[#04516f] leading-relaxed">
-                {project.jury_info}
-              </p>
-          </Card>
+                  <Card className="p-6 border-[#04516f]/20 bg-[#04516f]/5 dark:bg-[#04516f]/10 dark:border-[#04516f]/30">
+          <h2 className="text-xl font-semibold mb-4 text-[#04516f] dark:text-[#6ba3c7]">
+            ⚖️ Informazioni per la giuria
+          </h2>
+          <p className="text-[#04516f] dark:text-[#6ba3c7] leading-relaxed">
+            {project.jury_info}
+          </p>
+        </Card>
         )}
 
         {/* Project Details Grid */}
@@ -156,7 +156,7 @@ export default async function VotePage({ params }: { params: Promise<{ id: strin
               href={project.presentation_link} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-[#04516f] hover:text-[#033d5a] dark:text-[#04516f] dark:hover:text-[#033d5a] underline flex items-center gap-2"
+              className="text-[#04516f] hover:text-[#033d5a] dark:text-[#6ba3c7] dark:hover:text-[#8bb8d4] underline flex items-center gap-2"
             >
               🔗 Visualizza presentazione del progetto →
             </a>
