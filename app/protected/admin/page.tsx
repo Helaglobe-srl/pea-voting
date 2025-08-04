@@ -15,6 +15,13 @@ interface VoteWithEmail {
   email: string;
 }
 
+interface Project {
+  id: number;
+  name: string;
+  project_category: string | null;
+  [key: string]: any;
+}
+
 export default async function AdminDashboard() {
   const supabase = await createClient();
 
@@ -74,6 +81,16 @@ export default async function AdminDashboard() {
   
   // Fetch projects and criteria
   const { data: projects } = await supabase.from("projects").select("*").order("id");
+
+  // Group projects by category
+  const projectsByCategory = projects?.reduce((acc, project) => {
+    const category = project.project_category || 'senza categoria';
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(project);
+    return acc;
+  }, {} as Record<string, Project[]>) || {};
 
   // Create vote matrix: user -> project -> criteria -> score
   const voteMatrix = new Map<string, Map<number, Map<number, number>>>();
@@ -176,32 +193,86 @@ export default async function AdminDashboard() {
         </Card>
       </div>
 
-      {/* Voting Matrix Table */}
-      <Card className="p-6">
-        <h2 className="text-xl font-semibold mb-6">📊 Matrice dei voti</h2>
-        
-        {/* Mobile-first responsive table */}
-        <div className="block lg:hidden">
-          {/* Mobile Card Layout */}
-          <div className="space-y-4">
-            {regularUsers.map(user => {
-              const userScores = projects?.map(project => getAverageScore(user.id, project.id)).filter((score): score is number => score !== null) || [];
-              const userAverage = userScores.length > 0 
-                ? parseFloat((userScores.reduce((sum, score) => sum + score, 0) / userScores.length).toFixed(1))
-                : 0;
+      {/* Voting Matrix Tables by Category */}
+      {Object.entries(projectsByCategory).map(([category, categoryProjects]) => (
+        <Card key={category} className="p-6">
+          <h2 className="text-xl font-semibold mb-6">📊 {category}</h2>
+          
+          {/* Mobile-first responsive table */}
+          <div className="block lg:hidden">
+            {/* Mobile Card Layout */}
+            <div className="space-y-4">
+              {regularUsers.map(user => {
+                const userScores = (categoryProjects as Project[])?.map(project => getAverageScore(user.id, project.id)).filter((score): score is number => score !== null) || [];
+                const userAverage = userScores.length > 0 
+                  ? parseFloat((userScores.reduce((sum: number, score: number) => sum + score, 0) / userScores.length).toFixed(1))
+                  : 0;
 
-              return (
-                <Card key={user.id} className="p-4">
-                  <div className="space-y-3">
-                    <div className="font-medium text-sm border-b pb-2">
-                      {user.email}
+                return (
+                  <Card key={user.id} className="p-4">
+                    <div className="space-y-3">
+                      <div className="font-medium text-sm border-b pb-2">
+                        {user.email}
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        {(categoryProjects as Project[])?.map(project => {
+                          const score = getAverageScore(user.id, project.id);
+                          return (
+                            <div key={project.id} className="flex justify-between items-center p-2 bg-muted/50 rounded">
+                              <span className="truncate pr-2">{project.name}</span>
+                              {score !== null ? (
+                                <span className={`inline-block px-2 py-1 rounded text-white text-xs font-medium ${
+                                  score >= 4 ? 'bg-green-500' : 
+                                  score >= 3 ? 'bg-yellow-500' : 
+                                  score >= 2 ? 'bg-orange-500' : 'bg-red-500'
+                                }`}>
+                                  {score}
+                                </span>
+                              ) : (
+                                <span className="text-muted-foreground">-</span>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className="text-right text-sm font-bold border-t pt-2">
+                        Media Utente: {userAverage > 0 ? userAverage : '-'}
+                      </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      {projects?.map(project => {
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Desktop Table Layout */}
+          <div className="hidden lg:block overflow-x-auto">
+            <table className="w-full border-collapse text-sm">
+              <thead>
+                <tr className="bg-muted">
+                  <th className="p-3 text-left border">email utente</th>
+                  {(categoryProjects as Project[])?.map(project => (
+                    <th key={project.id} className="p-3 text-center border min-w-[120px]">
+                      {project.name}
+                    </th>
+                  ))}
+                  <th className="p-3 text-center border">media utente</th>
+                </tr>
+              </thead>
+              <tbody>
+                {regularUsers.map(user => {
+                  const userScores = (categoryProjects as Project[])?.map(project => getAverageScore(user.id, project.id)).filter((score): score is number => score !== null) || [];
+                  const userAverage = userScores.length > 0 
+                    ? parseFloat((userScores.reduce((sum: number, score: number) => sum + score, 0) / userScores.length).toFixed(1))
+                    : 0;
+
+                  return (
+                    <tr key={user.id} className="hover:bg-muted/50">
+                      <td className="p-3 border font-medium">{user.email}</td>
+                      {(categoryProjects as Project[])?.map(project => {
                         const score = getAverageScore(user.id, project.id);
                         return (
-                          <div key={project.id} className="flex justify-between items-center p-2 bg-muted/50 rounded">
-                            <span className="truncate pr-2">{project.name}</span>
+                          <td key={project.id} className="p-3 text-center border">
                             {score !== null ? (
                               <span className={`inline-block px-2 py-1 rounded text-white text-xs font-medium ${
                                 score >= 4 ? 'bg-green-500' : 
@@ -213,90 +284,38 @@ export default async function AdminDashboard() {
                             ) : (
                               <span className="text-muted-foreground">-</span>
                             )}
-                          </div>
+                          </td>
                         );
                       })}
-                    </div>
-                    <div className="text-right text-sm font-bold border-t pt-2">
-                      Media Utente: {userAverage > 0 ? userAverage : '-'}
-                    </div>
-                  </div>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Desktop Table Layout */}
-        <div className="hidden lg:block overflow-x-auto">
-          <table className="w-full border-collapse text-sm">
-            <thead>
-              <tr className="bg-muted">
-                <th className="p-3 text-left border">email utente</th>
-                {projects?.map(project => (
-                  <th key={project.id} className="p-3 text-center border min-w-[120px]">
-                    {project.name}
-                  </th>
-                ))}
-                <th className="p-3 text-center border">media utente</th>
-              </tr>
-            </thead>
-            <tbody>
-              {regularUsers.map(user => {
-                const userScores = projects?.map(project => getAverageScore(user.id, project.id)).filter((score): score is number => score !== null) || [];
-                const userAverage = userScores.length > 0 
-                  ? parseFloat((userScores.reduce((sum, score) => sum + score, 0) / userScores.length).toFixed(1))
-                  : 0;
-
-                return (
-                  <tr key={user.id} className="hover:bg-muted/50">
-                    <td className="p-3 border font-medium">{user.email}</td>
-                    {projects?.map(project => {
-                      const score = getAverageScore(user.id, project.id);
-                      return (
-                        <td key={project.id} className="p-3 text-center border">
-                          {score !== null ? (
-                            <span className={`inline-block px-2 py-1 rounded text-white text-xs font-medium ${
-                              score >= 4 ? 'bg-green-500' : 
-                              score >= 3 ? 'bg-yellow-500' : 
-                              score >= 2 ? 'bg-orange-500' : 'bg-red-500'
-                            }`}>
-                              {score}
-                            </span>
-                          ) : (
-                            <span className="text-muted-foreground">-</span>
-                          )}
-                        </td>
-                      );
-                    })}
-                    <td className="p-3 text-center border font-bold">
-                      {userAverage > 0 ? userAverage : '-'}
-                    </td>
-                  </tr>
-                );
-              })}
-              {/* Project averages row */}
-              <tr className="bg-muted font-bold">
-                <td className="p-3 border">medie progetti</td>
-                {projects?.map(project => {
-                  const projectAvg = getProjectAverage(project.id);
-                  return (
-                    <td key={project.id} className="p-3 text-center border">
-                      {projectAvg > 0 ? projectAvg : '-'}
-                    </td>
+                      <td className="p-3 text-center border font-bold">
+                        {userAverage > 0 ? userAverage : '-'}
+                      </td>
+                    </tr>
                   );
                 })}
-                <td className="p-3 text-center border">
-                  {projects && projects.length > 0 
-                    ? parseFloat((projects.reduce((sum, project) => sum + getProjectAverage(project.id), 0) / projects.length).toFixed(1))
-                    : '-'
-                  }
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </Card>
+                {/* Project averages row */}
+                <tr className="bg-muted font-bold">
+                  <td className="p-3 border">medie progetti</td>
+                  {(categoryProjects as Project[])?.map(project => {
+                    const projectAvg = getProjectAverage(project.id);
+                    return (
+                      <td key={project.id} className="p-3 text-center border">
+                        {projectAvg > 0 ? projectAvg : '-'}
+                      </td>
+                    );
+                  })}
+                  <td className="p-3 text-center border">
+                    {categoryProjects && (categoryProjects as Project[]).length > 0 
+                      ? parseFloat(((categoryProjects as Project[]).reduce((sum: number, project: Project) => sum + getProjectAverage(project.id), 0) / (categoryProjects as Project[]).length).toFixed(1))
+                      : '-'
+                    }
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      ))}
 
       {/* Legend */}
       <Card className="p-4">
