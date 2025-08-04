@@ -19,7 +19,8 @@ interface Project {
   id: number;
   name: string;
   project_category: string | null;
-  [key: string]: any;
+  organization_name?: string;
+  [key: string]: string | number | null | undefined;
 }
 
 export default async function AdminDashboard() {
