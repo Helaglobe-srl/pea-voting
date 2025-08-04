@@ -82,7 +82,7 @@ export default async function AdminDashboard() {
   // Fetch projects and criteria
   const { data: projects } = await supabase.from("projects").select("*").order("id");
 
-  // Group projects by category
+  // Group projects by category and sort by organization_name
   const projectsByCategory = projects?.reduce((acc, project) => {
     const category = project.project_category || 'senza categoria';
     if (!acc[category]) {
@@ -91,6 +91,15 @@ export default async function AdminDashboard() {
     acc[category].push(project);
     return acc;
   }, {} as Record<string, Project[]>) || {};
+
+  // Sort projects within each category by organization_name (ascending)
+  Object.keys(projectsByCategory).forEach(category => {
+    projectsByCategory[category].sort((a: Project, b: Project) => {
+      const orgA = a.organization_name || '';
+      const orgB = b.organization_name || '';
+      return orgA.localeCompare(orgB);
+    });
+  });
 
   // Create vote matrix: user -> project -> criteria -> score
   const voteMatrix = new Map<string, Map<number, Map<number, number>>>();
@@ -219,9 +228,16 @@ export default async function AdminDashboard() {
                           const score = getAverageScore(user.id, project.id);
                           return (
                             <div key={project.id} className="flex justify-between items-center p-2 bg-muted/50 rounded">
-                              <span className="truncate pr-2">{project.name}</span>
+                              <div className="flex-1 min-w-0">
+                                <div className="font-medium truncate">{project.name}</div>
+                                {project.organization_name && (
+                                  <div className="text-xs text-muted-foreground truncate">
+                                    {project.organization_name}
+                                  </div>
+                                )}
+                              </div>
                               {score !== null ? (
-                                <span className={`inline-block px-2 py-1 rounded text-white text-xs font-medium ${
+                                <span className={`inline-block px-2 py-1 rounded text-white text-xs font-medium ml-2 flex-shrink-0 ${
                                   score >= 4 ? 'bg-green-500' : 
                                   score >= 3 ? 'bg-yellow-500' : 
                                   score >= 2 ? 'bg-orange-500' : 'bg-red-500'
@@ -229,7 +245,7 @@ export default async function AdminDashboard() {
                                   {score}
                                 </span>
                               ) : (
-                                <span className="text-muted-foreground">-</span>
+                                <span className="text-muted-foreground ml-2 flex-shrink-0">-</span>
                               )}
                             </div>
                           );
@@ -252,8 +268,15 @@ export default async function AdminDashboard() {
                 <tr className="bg-muted">
                   <th className="p-3 text-left border">email utente</th>
                   {(categoryProjects as Project[])?.map(project => (
-                    <th key={project.id} className="p-3 text-center border min-w-[120px]">
-                      {project.name}
+                    <th key={project.id} className="p-3 text-center border min-w-[150px]">
+                      <div className="flex flex-col gap-1">
+                        <div className="font-medium text-sm">{project.name}</div>
+                        {project.organization_name && (
+                          <div className="text-xs text-muted-foreground font-normal">
+                            {project.organization_name}
+                          </div>
+                        )}
+                      </div>
                     </th>
                   ))}
                   <th className="p-3 text-center border">media utente</th>
@@ -299,7 +322,7 @@ export default async function AdminDashboard() {
                   {(categoryProjects as Project[])?.map(project => {
                     const projectAvg = getProjectAverage(project.id);
                     return (
-                      <td key={project.id} className="p-3 text-center border">
+                      <td key={project.id} className="p-3 text-center border font-bold">
                         {projectAvg > 0 ? projectAvg : '-'}
                       </td>
                     );
