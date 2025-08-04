@@ -228,14 +228,16 @@ export default async function AdminDashboard() {
                           const score = getAverageScore(user.id, project.id);
                           return (
                             <div key={project.id} className="flex justify-between items-center p-2 bg-muted/50 rounded">
-                              <div className="flex-1 min-w-0">
-                                <div className="font-medium truncate">{project.name}</div>
+                              <Link href={`/protected/admin/project/${project.id}`} className="flex-1 min-w-0 hover:bg-muted/30 transition-colors rounded p-1">
+                                <div className="font-medium truncate text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline">
+                                  {project.name}
+                                </div>
                                 {project.organization_name && (
                                   <div className="text-xs text-muted-foreground truncate">
                                     {project.organization_name}
                                   </div>
                                 )}
-                              </div>
+                              </Link>
                               {score !== null ? (
                                 <span className={`inline-block px-2 py-1 rounded text-white text-xs font-medium ml-2 flex-shrink-0 ${
                                   score >= 4 ? 'bg-green-500' : 
@@ -269,14 +271,18 @@ export default async function AdminDashboard() {
                   <th className="p-3 text-left border">email utente</th>
                   {(categoryProjects as Project[])?.map(project => (
                     <th key={project.id} className="p-3 text-center border min-w-[150px]">
-                      <div className="flex flex-col gap-1">
-                        <div className="font-medium text-sm">{project.name}</div>
-                        {project.organization_name && (
-                          <div className="text-xs text-muted-foreground font-normal">
-                            {project.organization_name}
+                      <Link href={`/protected/admin/project/${project.id}`} className="block hover:bg-muted/50 transition-colors rounded p-1">
+                        <div className="flex flex-col gap-1">
+                          <div className="font-medium text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline">
+                            {project.name}
                           </div>
-                        )}
-                      </div>
+                          {project.organization_name && (
+                            <div className="text-xs text-muted-foreground font-normal">
+                              {project.organization_name}
+                            </div>
+                          )}
+                        </div>
+                      </Link>
                     </th>
                   ))}
                   <th className="p-3 text-center border">media utente</th>
