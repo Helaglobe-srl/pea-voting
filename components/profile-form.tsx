@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 // import { toast } from "react-hot-toast";
 
@@ -21,7 +21,9 @@ interface ProfileFormProps {
 export function ProfileForm({ initialData, userId }: ProfileFormProps) {
   const [nome, setNome] = useState(initialData.nome || "");
   const [cognome, setCognome] = useState(initialData.cognome || "");
-  const [rappresentaAssociazione, setRappresentaAssociazione] = useState(initialData.rappresenta_associazione || false);
+  const [rappresentaAssociazione, setRappresentaAssociazione] = useState(
+    initialData.rappresenta_associazione ? "si" : "no"
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -46,7 +48,7 @@ export function ProfileForm({ initialData, userId }: ProfileFormProps) {
           .update({ 
             nome, 
             cognome, 
-            rappresenta_associazione: rappresentaAssociazione 
+            rappresenta_associazione: rappresentaAssociazione === "si"
           })
           .eq("id", userId);
 
@@ -59,7 +61,7 @@ export function ProfileForm({ initialData, userId }: ProfileFormProps) {
             id: userId, 
             nome, 
             cognome, 
-            rappresenta_associazione: rappresentaAssociazione 
+            rappresenta_associazione: rappresentaAssociazione === "si"
           });
 
         if (error) throw error;
@@ -112,15 +114,28 @@ export function ProfileForm({ initialData, userId }: ProfileFormProps) {
           />
         </div>
 
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="rappresenta-associazione"
-            checked={rappresentaAssociazione}
-            onCheckedChange={(checked) => setRappresentaAssociazione(checked as boolean)}
-          />
-          <Label htmlFor="rappresenta-associazione" className="text-sm font-normal">
+        <div className="grid gap-2">
+          <Label className="text-base font-medium">
             Rappresento un&apos;Associazione di Insieme Per
           </Label>
+          <RadioGroup
+            value={rappresentaAssociazione}
+            onValueChange={setRappresentaAssociazione}
+            className="flex flex-col space-y-1"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="si" id="profile-si" />
+              <Label htmlFor="profile-si" className="text-sm font-normal">
+                Si
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="no" id="profile-no" />
+              <Label htmlFor="profile-no" className="text-sm font-normal">
+                No
+              </Label>
+            </div>
+          </RadioGroup>
         </div>
 
         <Button type="submit" disabled={isLoading}>
@@ -129,4 +144,5 @@ export function ProfileForm({ initialData, userId }: ProfileFormProps) {
       </form>
     </div>
   );
+}
 }

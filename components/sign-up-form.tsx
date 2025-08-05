@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -27,7 +27,7 @@ export function SignUpForm({
   const [repeatPassword, setRepeatPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
-  const [rappresentaAssociazione, setRappresentaAssociazione] = useState(false);
+  const [rappresentaAssociazione, setRappresentaAssociazione] = useState("no");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -53,7 +53,7 @@ export function SignUpForm({
           // this will send an otp code for email verification
           emailRedirectTo: `${window.location.origin}/auth/verify-otp?email=${encodeURIComponent(email)}&type=signup`,
           data: {
-            rappresenta_associazione: rappresentaAssociazione
+            rappresenta_associazione: rappresentaAssociazione === "si"
           }
         },
       });
@@ -144,16 +144,28 @@ export function SignUpForm({
                   </Button>
                 </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="rappresenta-associazione"
-                  checked={rappresentaAssociazione}
-                  onCheckedChange={(checked) => setRappresentaAssociazione(checked as boolean)}
-                  required
-                />
-                <Label htmlFor="rappresenta-associazione" className="text-sm font-normal">
+              <div className="grid gap-2">
+                <Label className="text-base font-medium">
                   Rappresento un&apos;Associazione di Insieme Per
                 </Label>
+                <RadioGroup
+                  value={rappresentaAssociazione}
+                  onValueChange={setRappresentaAssociazione}
+                  className="flex flex-col space-y-1"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="si" id="si" />
+                    <Label htmlFor="si" className="text-sm font-normal">
+                      Si
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="no" id="no" />
+                    <Label htmlFor="no" className="text-sm font-normal">
+                      No
+                    </Label>
+                  </div>
+                </RadioGroup>
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>
@@ -172,3 +184,4 @@ export function SignUpForm({
     </div>
   );
 }
+
