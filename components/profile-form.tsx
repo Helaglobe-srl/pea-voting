@@ -145,4 +145,3 @@ export function ProfileForm({ initialData, userId }: ProfileFormProps) {
     </div>
   );
 }
-}
