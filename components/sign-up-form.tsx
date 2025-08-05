@@ -46,7 +46,7 @@ export function SignUpForm({
 
     try {
       // create account and send otp in one call
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -152,7 +152,7 @@ export function SignUpForm({
                   required
                 />
                 <Label htmlFor="rappresenta-associazione" className="text-sm font-normal">
-                  Rappresento un'Associazione di Insieme Per
+                  Rappresento un&apos;Associazione di Insieme Per
                 </Label>
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}

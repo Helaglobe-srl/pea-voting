@@ -119,7 +119,7 @@ export function ProfileForm({ initialData, userId }: ProfileFormProps) {
             onCheckedChange={(checked) => setRappresentaAssociazione(checked as boolean)}
           />
           <Label htmlFor="rappresenta-associazione" className="text-sm font-normal">
-            Rappresento un'Associazione di Insieme Per
+            Rappresento un&apos;Associazione di Insieme Per
           </Label>
         </div>
 
