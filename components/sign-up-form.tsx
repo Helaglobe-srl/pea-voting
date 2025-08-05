@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -23,6 +24,7 @@ export function SignUpForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
+  const [rappresentaAssociazione, setRappresentaAssociazione] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -41,12 +43,15 @@ export function SignUpForm({
 
     try {
       // create account and send otp in one call
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           // this will send an otp code for email verification
           emailRedirectTo: `${window.location.origin}/auth/verify-otp?email=${encodeURIComponent(email)}&type=signup`,
+          data: {
+            rappresenta_associazione: rappresentaAssociazione
+          }
         },
       });
 
@@ -105,6 +110,17 @@ export function SignUpForm({
                   value={repeatPassword}
                   onChange={(e) => setRepeatPassword(e.target.value)}
                 />
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="rappresenta-associazione"
+                  checked={rappresentaAssociazione}
+                  onCheckedChange={(checked) => setRappresentaAssociazione(checked as boolean)}
+                  required
+                />
+                <Label htmlFor="rappresenta-associazione" className="text-sm font-normal">
+                  Rappresento un'Associazione di Insieme Per
+                </Label>
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>

@@ -24,10 +24,10 @@ export default async function ProfilePage() {
     redirect("/protected/admin");
   }
 
-  // get user profile data (nome and cognome)
+  // get user profile data (nome, cognome, and rappresenta_associazione)
   const { data: userProfile } = await supabase
     .from("user_profiles")
-    .select("nome, cognome")
+    .select("nome, cognome, rappresenta_associazione")
     .eq("id", user.id)
     .single();
 
@@ -67,7 +67,8 @@ export default async function ProfilePage() {
             <ProfileForm 
               initialData={{
                 nome: userProfile?.nome || "",
-                cognome: userProfile?.cognome || ""
+                cognome: userProfile?.cognome || "",
+                rappresenta_associazione: userProfile?.rappresenta_associazione || false
               }}
               userId={user.id}
             />
