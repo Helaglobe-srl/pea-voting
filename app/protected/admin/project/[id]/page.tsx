@@ -91,9 +91,20 @@ export default async function AdminProjectPage({ params }: { params: Promise<{ i
         {project.objectives_results && (
           <Card className="p-6">
             <h3 className="font-semibold text-lg mb-4">🎯 Obiettivi e risultati</h3>
-            <p className="text-muted-foreground leading-relaxed">
-              {project.objectives_results}
-            </p>
+            <div className="text-muted-foreground leading-relaxed space-y-2">
+              {project.objectives_results.split('-').map((item: string, index: number) => {
+                const trimmedItem = item.trim();
+                if (trimmedItem) {
+                  return (
+                    <div key={index} className="flex items-start gap-2">
+                      <span className="text-blue-600 dark:text-blue-400 mt-1">•</span>
+                      <span>{trimmedItem}</span>
+                    </div>
+                  );
+                }
+                return null;
+              })}
+            </div>
           </Card>
         )}
 
