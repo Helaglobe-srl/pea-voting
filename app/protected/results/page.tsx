@@ -67,12 +67,13 @@ const truncateText = (text: string, maxLength: number = 150): string => {
 };
 
 interface ResultsPageProps {
-  searchParams: {
+  searchParams: Promise<{
     page?: string;
-  };
+  }>;
 }
 
 export default async function ResultsPage({ searchParams }: ResultsPageProps) {
+  const resolvedSearchParams = await searchParams;
   const supabase = await createClient();
 
   // Check if user is authenticated
@@ -201,7 +202,7 @@ export default async function ResultsPage({ searchParams }: ResultsPageProps) {
   const individualVoterCount = individualVoters.size;
 
   // pagination logic
-  const currentPage = parseInt(searchParams.page || "1", 10);
+  const currentPage = parseInt(resolvedSearchParams.page || "1", 10);
   const itemsPerPage = 10;
   const totalProjects = projectResults.length;
   const totalPages = Math.ceil(totalProjects / itemsPerPage);
