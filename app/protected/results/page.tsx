@@ -4,6 +4,15 @@ import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ChartBarIcon, ArrowLeftIcon } from "lucide-react";
+import { 
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
 
 interface VoteWithEmail {
   id: number;
@@ -21,7 +30,13 @@ const truncateText = (text: string, maxLength: number = 150): string => {
   return text.slice(0, maxLength) + "...";
 };
 
-export default async function ResultsPage() {
+interface ResultsPageProps {
+  searchParams: {
+    page?: string;
+  };
+}
+
+export default async function ResultsPage({ searchParams }: ResultsPageProps) {
   const supabase = await createClient();
 
   // Check if user is authenticated
@@ -106,6 +121,35 @@ export default async function ResultsPage() {
   // Get total number of normal users who voted
   const uniqueNormalUsers = new Set(normalUserVotes.map(vote => vote.user_id));
   const uniqueVoterCount = uniqueNormalUsers.size;
+  
+  // Count association vs individual voters
+  const associationVoters = new Set(
+    normalUserVotes
+      .filter(vote => vote.rappresenta_associazione)
+      .map(vote => vote.user_id)
+  );
+  const individualVoters = new Set(
+    normalUserVotes
+      .filter(vote => !vote.rappresenta_associazione)
+      .map(vote => vote.user_id)
+  );
+  
+  const associationVoterCount = associationVoters.size;
+  const individualVoterCount = individualVoters.size;
+
+  // pagination logic
+  const currentPage = parseInt(searchParams.page || "1", 10);
+  const itemsPerPage = 10;
+  const totalProjects = projectResults.length;
+  const totalPages = Math.ceil(totalProjects / itemsPerPage);
+  
+  // ensure current page is valid
+  const validCurrentPage = Math.max(1, Math.min(currentPage, totalPages));
+  
+  // get projects for current page
+  const startIndex = (validCurrentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentPageProjects = projectResults.slice(startIndex, endIndex);
 
   return (
     <div className="flex-1 w-full flex flex-col gap-8">
@@ -172,6 +216,76 @@ export default async function ResultsPage() {
           </Card>
         ))}
       </div>
+
+      {totalPages > 1 && (
+        <Pagination className="mt-8">
+          <PaginationContent>
+            {validCurrentPage > 1 && (
+              <PaginationItem>
+                <Link href={`/protected/results?page=${validCurrentPage - 1}`}>
+                  <PaginationPrevious />
+                </Link>
+              </PaginationItem>
+            )}
+            
+            {/* show first page if not visible */}
+            {validCurrentPage > 3 && (
+              <>
+                <PaginationItem>
+                  <Link href="/protected/results?page=1">
+                    <PaginationLink>1</PaginationLink>
+                  </Link>
+                </PaginationItem>
+                {validCurrentPage > 4 && (
+                  <PaginationItem>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                )}
+              </>
+            )}
+            
+            {/* show page numbers around current page */}
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              const page = Math.max(1, validCurrentPage - 2) + i;
+              if (page > totalPages) return null;
+              
+              return (
+                <PaginationItem key={page}>
+                  <Link href={`/protected/results?page=${page}`}>
+                    <PaginationLink isActive={page === validCurrentPage}>
+                      {page}
+                    </PaginationLink>
+                  </Link>
+                </PaginationItem>
+              );
+            }).filter(Boolean)}
+            
+            {/* show last page if not visible */}
+            {validCurrentPage < totalPages - 2 && (
+              <>
+                {validCurrentPage < totalPages - 3 && (
+                  <PaginationItem>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                )}
+                <PaginationItem>
+                  <Link href={`/protected/results?page=${totalPages}`}>
+                    <PaginationLink>{totalPages}</PaginationLink>
+                  </Link>
+                </PaginationItem>
+              </>
+            )}
+            
+            {validCurrentPage < totalPages && (
+              <PaginationItem>
+                <Link href={`/protected/results?page=${validCurrentPage + 1}`}>
+                  <PaginationNext />
+                </Link>
+              </PaginationItem>
+            )}
+          </PaginationContent>
+        </Pagination>
+      )}
 
     </div>
   );
