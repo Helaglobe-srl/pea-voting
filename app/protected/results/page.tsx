@@ -43,7 +43,14 @@ interface Project {
   name: string;
   jury_info?: string;
   objectives_results?: string;
-  [key: string]: any;
+  organization_name?: string;
+  project_title?: string;
+  project_category?: string;
+  organization_type?: string;
+  therapeutic_area?: string;
+  presentation_link?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 // interface for project results
