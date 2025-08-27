@@ -25,6 +25,34 @@ interface VoteWithEmailAndWeight {
   rappresenta_associazione: boolean;
 }
 
+// interface for criteria results with weighted voting information
+interface CriteriaResult {
+  criterionId: number;
+  criterionName: string;
+  averageScore: number;
+  voteCount: number;
+  associationVoteCount: number;
+  individualVoteCount: number;
+  associationAvg: number;
+  individualAvg: number;
+}
+
+// interface for project data
+interface Project {
+  id: number;
+  name: string;
+  jury_info?: string;
+  objectives_results?: string;
+  [key: string]: any;
+}
+
+// interface for project results
+interface ProjectResult {
+  project: Project;
+  criteriaResults: CriteriaResult[];
+  overallAverage: number;
+}
+
 // helper function to truncate text
 const truncateText = (text: string, maxLength: number = 150): string => {
   if (text.length <= maxLength) return text;
@@ -49,7 +77,7 @@ export default async function ResultsPage({ searchParams }: ResultsPageProps) {
   // Check if user is admin by email
   const userEmail = sessionData.session.user.email;
   const adminEmail = process.env.ADMIN_EMAIL;
-  if (!adminEmail || userEmail !== adminEmail) {
+  if (!adminEmail || !userEmail || userEmail !== adminEmail) {
     redirect("/protected?error=unauthorized");
   }
 
@@ -83,10 +111,10 @@ export default async function ResultsPage({ searchParams }: ResultsPageProps) {
   }
 
   // For each project, get weighted average score for each criteria (from normal users only)
-  const projectResults = await Promise.all(
-    (projects || []).map(async (project) => {
-      const results = await Promise.all(
-        (criteria || []).map(async (criterion) => {
+  const projectResults: ProjectResult[] = await Promise.all(
+    (projects || []).map(async (project): Promise<ProjectResult> => {
+      const results: CriteriaResult[] = await Promise.all(
+        (criteria || []).map(async (criterion): Promise<CriteriaResult> => {
           // Filter votes for this project and criteria from normal users only
           const projectCriteriaVotes = normalUserVotes.filter(
             vote => vote.project_id === project.id && vote.criteria_id === criterion.id
