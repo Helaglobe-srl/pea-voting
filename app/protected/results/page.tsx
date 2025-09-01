@@ -236,19 +236,19 @@ export default async function ResultsPage({ searchParams }: ResultsPageProps) {
             <span className="font-medium">Giurati votanti: </span>
             <span>{uniqueVoterCount}</span>
             <span className="text-[#04516f]/70 ml-2">({normalUserVotes.length} voti totali)</span>
-            <span className="text-[#04516f]/70 ml-4">
-              Pagina {validCurrentPage} di {totalPages} 
+                          <span className="text-[#04516f]/70 ml-4">
+              Pagina {validCurrentPage} di {totalPages} {" "}
               ({totalProjects} progetti totali)
             </span>
           </div>
         </div>
         <div className="text-[#04516f] text-sm flex items-center gap-4">
           <span>
-            <span className="font-medium">Rappresentanti associazioni:</span> {associationVoterCount} 
+            <span className="font-medium">Rappresentanti associazioni:</span> {associationVoterCount} {" "}
             <span className="text-[#04516f]/70">(peso 60%)</span>
           </span>
           <span>
-            <span className="font-medium">Giurati individuali:</span> {individualVoterCount}
+            <span className="font-medium">Giurati individuali:</span> {individualVoterCount} {" "}
             <span className="text-[#04516f]/70">(peso 40%)</span>
           </span>
         </div>
