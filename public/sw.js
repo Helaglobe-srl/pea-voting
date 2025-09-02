@@ -16,3 +16,5 @@ self.addEventListener('fetch', function(event) {
   // let browser handle all requests normally
   return;
 });
+
+
