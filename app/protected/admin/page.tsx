@@ -380,7 +380,7 @@ export default async function AdminDashboard() {
             <table className="w-full border-collapse text-sm">
               <thead>
                 <tr className="bg-muted">
-                  <th className="p-3 text-left border">email utente</th>
+                  <th className="p-3 text-left border sticky left-0 bg-muted z-10">email utente</th>
                   {(categoryProjects as Project[])?.map(project => (
                     <th key={project.id} className="p-3 text-center border min-w-[150px]">
                       <Link href={`/protected/admin/project/${project.id}`} className="block hover:bg-muted/50 transition-colors rounded p-1">
@@ -407,9 +407,9 @@ export default async function AdminDashboard() {
                     ? parseFloat((userScores.reduce((sum: number, score: number) => sum + score, 0) / userScores.length).toFixed(1))
                     : 0;
 
-                  return (
-                    <tr key={user.id} className="hover:bg-muted/50">
-                      <td className="p-3 border font-medium">{user.email}</td>
+                   return (
+                     <tr key={user.id} className="hover:bg-muted/50">
+                       <td className="p-3 border font-medium sticky left-0 bg-background z-10 hover:bg-muted/50">{user.email}</td>
                       {(categoryProjects as Project[])?.map(project => {
                         const score = getAverageScore(user.id, project.id);
                         const individualScores = getIndividualScores(user.id, project.id);
@@ -445,9 +445,9 @@ export default async function AdminDashboard() {
                     </tr>
                   );
                 })}
-                {/* Project averages row */}
-                <tr className="bg-muted font-bold">
-                  <td className="p-3 border">medie progetti</td>
+                 {/* Project averages row */}
+                 <tr className="bg-muted font-bold">
+                   <td className="p-3 border sticky left-0 bg-muted z-10">medie progetti</td>
                   {(categoryProjects as Project[])?.map(project => {
                     const projectAvg = getProjectAverage(project.id);
                     return (
