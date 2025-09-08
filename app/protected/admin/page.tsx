@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { UsersIcon, BarChart3Icon, UploadIcon } from "lucide-react";
 
-interface VoteWithEmail {
+interface VoteWithEmailAndWeight {
   id: number;
   user_id: string;
   project_id: number;
@@ -13,6 +13,7 @@ interface VoteWithEmail {
   score: number;
   created_at: string;
   email: string;
+  rappresenta_associazione: boolean;
 }
 
 interface Project {
@@ -39,15 +40,15 @@ export default async function AdminDashboard() {
     redirect("/protected?error=unauthorized");
   }
 
-  // Get all votes with user emails (excluding admin)
+  // Get all votes with user emails and weights (excluding admin)
   const { data: votesWithEmails, error: votesError } = await supabase
-    .rpc('get_votes_with_emails');
+    .rpc('get_votes_with_emails_and_weights');
 
   if (votesError) {
-    console.error("Error fetching votes with emails:", votesError);
+    console.error("Error fetching votes with emails and weights:", votesError);
   }
 
-  const regularUserVotes = (votesWithEmails as VoteWithEmail[]) || [];
+  const regularUserVotes = (votesWithEmails as VoteWithEmailAndWeight[]) || [];
   
   // Get total count of registered users (excluding admin) from auth.users using RPC
   const { data: totalUsersCount, error: usersCountError } = await supabase
@@ -75,10 +76,21 @@ export default async function AdminDashboard() {
   
   // Calculate number of users who have voted at least 1 project (Giurati Votanti)
   const usersWhoVoted = new Set<string>();
+  const associationUsers = new Set<string>();
+  const individualUsers = new Set<string>();
+  
   regularUserVotes.forEach(vote => {
     usersWhoVoted.add(vote.user_id);
+    if (vote.rappresenta_associazione) {
+      associationUsers.add(vote.user_id);
+    } else {
+      individualUsers.add(vote.user_id);
+    }
   });
+  
   const giuratiVotanti = usersWhoVoted.size;
+  const rappresentantiAssociazioni = associationUsers.size;
+  const giuratiIndividuali = individualUsers.size;
   
   // Fetch projects and criteria
   const { data: projects } = await supabase.from("projects").select("*").order("id");
@@ -102,6 +114,9 @@ export default async function AdminDashboard() {
     });
   });
 
+  // Fetch voting criteria for display
+  const { data: criteria } = await supabase.from("voting_criteria").select("*").order("id");
+
   // Create vote matrix: user -> project -> criteria -> score
   const voteMatrix = new Map<string, Map<number, Map<number, number>>>();
   regularUserVotes.forEach(vote => {
@@ -117,6 +132,21 @@ export default async function AdminDashboard() {
     }
     voteMatrix.get(userId)!.get(projectId)!.set(criteriaId, vote.score);
   });
+
+  // Get individual criteria scores for a user-project combination
+  const getIndividualScores = (userId: string, projectId: number): { [criteriaId: number]: number } | null => {
+    const userVotes = voteMatrix.get(userId);
+    if (!userVotes || !userVotes.has(projectId)) return null;
+    
+    const projectVotes = userVotes.get(projectId)!;
+    const scores: { [criteriaId: number]: number } = {};
+    
+    projectVotes.forEach((score, criteriaId) => {
+      scores[criteriaId] = score;
+    });
+    
+    return scores;
+  };
 
   // Calculate averages for each project-user combination
   const getAverageScore = (userId: string, projectId: number): number | null => {
@@ -171,7 +201,7 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <Card className="p-4">
           <div className="flex items-center gap-3">
             <UsersIcon className="h-8 w-8 text-[#04516f]" />
@@ -192,12 +222,78 @@ export default async function AdminDashboard() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-3">
+            <div className="h-8 w-8 bg-green-600 rounded flex items-center justify-center text-white text-sm font-bold">
+              A
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Rappresentanti associazioni</p>
+              <p className="text-2xl font-bold">{rappresentantiAssociazioni}</p>
+              <p className="text-xs text-muted-foreground">(peso 60%)</p>
+            </div>
+          </div>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 bg-blue-600 rounded flex items-center justify-center text-white text-sm font-bold">
+              I
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Giurati individuali</p>
+              <p className="text-2xl font-bold">{giuratiIndividuali}</p>
+              <p className="text-xs text-muted-foreground">(peso 40%)</p>
+            </div>
+          </div>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
             <div className="h-8 w-8 bg-[#04516f] rounded flex items-center justify-center text-white text-sm font-bold">
               P
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Progetti totali</p>
               <p className="text-2xl font-bold">{projects?.length || 0}</p>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Criteria and Legend */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="p-4">
+          <h3 className="font-semibold mb-3">📋 Criteri di valutazione</h3>
+          <div className="space-y-3 text-sm">
+            {criteria?.map((criterion, index) => (
+              <div key={criterion.id} className="flex gap-3">
+                <div className="flex-shrink-0 w-6 h-6 bg-[#04516f] text-white rounded-full flex items-center justify-center text-xs font-bold">
+                  {index + 1}
+                </div>
+                <div>
+                  <div className="font-medium text-[#04516f]">{criterion.name}</div>
+                  <div className="text-muted-foreground text-xs">{criterion.description}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+        
+        <Card className="p-4">
+          <h3 className="font-semibold mb-3">🎨 Legenda punteggi</h3>
+          <div className="flex flex-col gap-2 text-xs">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-[#04516f] rounded"></div>
+              <span>4.0-5.0 (eccellente)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-[#ffea1d] rounded"></div>
+              <span>3.0-3.9 (buono)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-orange-500 rounded"></div>
+              <span>2.0-2.9 (discreto)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-red-500 rounded"></div>
+              <span>1.0-1.9 (scarso)</span>
             </div>
           </div>
         </Card>
@@ -227,28 +323,43 @@ export default async function AdminDashboard() {
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         {(categoryProjects as Project[])?.map(project => {
                           const score = getAverageScore(user.id, project.id);
+                          const individualScores = getIndividualScores(user.id, project.id);
                           return (
-                            <div key={project.id} className="flex justify-between items-center p-2 bg-muted/50 rounded">
-                              <Link href={`/protected/admin/project/${project.id}`} className="flex-1 min-w-0 hover:bg-muted/30 transition-colors rounded p-1">
-                                <div className="font-medium truncate text-[#04516f] hover:text-[#033d5a] dark:text-[#6ba3c7] dark:hover:text-[#8bb8d4] underline">
-                                  {project.name}
-                                </div>
-                                {project.organization_name && (
-                                  <div className="text-xs text-muted-foreground truncate">
-                                    {project.organization_name}
+                            <div key={project.id} className="flex flex-col gap-2 p-2 bg-muted/50 rounded">
+                              <div className="flex justify-between items-center">
+                                <Link href={`/protected/admin/project/${project.id}`} className="flex-1 min-w-0 hover:bg-muted/30 transition-colors rounded p-1">
+                                  <div className="font-medium truncate text-[#04516f] hover:text-[#033d5a] dark:text-[#6ba3c7] dark:hover:text-[#8bb8d4] underline">
+                                    {project.name}
                                   </div>
+                                  {project.organization_name && (
+                                    <div className="text-xs text-muted-foreground truncate">
+                                      {project.organization_name}
+                                    </div>
+                                  )}
+                                </Link>
+                                {score !== null ? (
+                                  <span className={`inline-block px-2 py-1 rounded text-xs font-medium ml-2 flex-shrink-0 ${
+                                    score >= 4 ? 'bg-[#04516f] text-white' : 
+                                    score >= 3 ? 'bg-[#ffea1d] text-[#04516f]' : 
+                                    score >= 2 ? 'bg-orange-500 text-white' : 'bg-red-500 text-white'
+                                  }`}>
+                                    avg: {score}
+                                  </span>
+                                ) : (
+                                  <span className="text-muted-foreground ml-2 flex-shrink-0">-</span>
                                 )}
-                              </Link>
-                              {score !== null ? (
-                                <span className={`inline-block px-2 py-1 rounded text-xs font-medium ml-2 flex-shrink-0 ${
-                                  score >= 4 ? 'bg-[#04516f] text-white' : 
-                                  score >= 3 ? 'bg-[#ffea1d] text-[#04516f]' : 
-                                  score >= 2 ? 'bg-orange-500 text-white' : 'bg-red-500 text-white'
-                                }`}>
-                                  {score}
-                                </span>
-                              ) : (
-                                <span className="text-muted-foreground ml-2 flex-shrink-0">-</span>
+                              </div>
+                              {individualScores && criteria && (
+                                <div className="flex flex-wrap gap-1 text-xs">
+                                  {criteria.map(criterion => (
+                                    <div key={criterion.id} className="flex items-center gap-1 px-2 py-1 bg-background rounded border">
+                                      <span className="text-muted-foreground">{criterion.name.substring(0, 10)}:</span>
+                                      <span className="font-medium">
+                                        {individualScores[criterion.id] || '-'}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
                               )}
                             </div>
                           );
@@ -301,16 +412,27 @@ export default async function AdminDashboard() {
                       <td className="p-3 border font-medium">{user.email}</td>
                       {(categoryProjects as Project[])?.map(project => {
                         const score = getAverageScore(user.id, project.id);
+                        const individualScores = getIndividualScores(user.id, project.id);
                         return (
                           <td key={project.id} className="p-3 text-center border">
-                            {score !== null ? (
-                              <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
-                                score >= 4 ? 'bg-[#04516f] text-white' : 
-                                score >= 3 ? 'bg-[#ffea1d] text-[#04516f]' : 
-                                score >= 2 ? 'bg-orange-500 text-white' : 'bg-red-500 text-white'
-                              }`}>
-                                {score}
-                              </span>
+                            {score !== null && individualScores ? (
+                              <div className="flex flex-col gap-1 items-center">
+                                <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                                  score >= 4 ? 'bg-[#04516f] text-white' : 
+                                  score >= 3 ? 'bg-[#ffea1d] text-[#04516f]' : 
+                                  score >= 2 ? 'bg-orange-500 text-white' : 'bg-red-500 text-white'
+                                }`}>
+                                  avg: {score}
+                                </span>
+                                <div className="text-xs text-muted-foreground">
+                                  {criteria?.map((criterion, index) => (
+                                    <span key={criterion.id}>
+                                      {individualScores[criterion.id] || '-'}
+                                      {index < criteria.length - 1 && ' | '}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
                             ) : (
                               <span className="text-muted-foreground">-</span>
                             )}
@@ -346,29 +468,6 @@ export default async function AdminDashboard() {
           </div>
         </Card>
       ))}
-
-      {/* Legend */}
-      <Card className="p-4">
-                        <h3 className="font-semibold mb-3">🎨 Legenda punteggi</h3>
-        <div className="flex gap-4 text-xs">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-[#04516f] rounded"></div>
-            <span>4.0-5.0 (eccellente)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-[#ffea1d] rounded"></div>
-            <span>3.0-3.9 (buono)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-orange-500 rounded"></div>
-            <span>2.0-2.9 (discreto)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-red-500 rounded"></div>
-            <span>1.0-1.9 (scarso)</span>
-          </div>
-        </div>
-      </Card>
 
     </div>
   );
