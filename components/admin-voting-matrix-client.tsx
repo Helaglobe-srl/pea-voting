@@ -239,7 +239,7 @@ export function AdminVotingMatrixClient({ initialData }: AdminVotingMatrixClient
             <table className="w-full border-collapse text-sm">
               <thead>
                 <tr className="bg-muted">
-                  <th className="p-3 text-left border sticky left-0 bg-muted z-10">email utente</th>
+                  <th className="p-3 text-left border sticky left-0 bg-muted z-10">Giurato</th>
                   {(categoryProjects as Project[])?.map(project => (
                     <th key={project.id} className="p-3 text-center border min-w-[150px]">
                       <Link href={`/protected/admin/project/${project.id}`} className="block hover:bg-muted/50 transition-colors rounded p-1">

@@ -40,14 +40,14 @@ export default async function AdminDashboard() {
           <Button asChild variant="outline" size="sm" className="flex-1 sm:flex-none">
             <Link href="/protected/admin/upload" className="flex items-center justify-center gap-2">
               <UploadIcon size={16} />
-              <span className="hidden xs:inline">carica excel</span>
+              <span className="hidden xs:inline">Carica excel</span>
               <span className="xs:hidden">carica</span>
             </Link>
           </Button>
           <Button asChild variant="outline" size="sm" className="flex-1 sm:flex-none">
             <Link href="/protected/results" className="flex items-center justify-center gap-2">
               <BarChart3Icon size={16} />
-              <span className="hidden xs:inline">risultati dettagliati</span>
+              <span className="hidden xs:inline">Risultati</span>
               <span className="xs:hidden">risultati</span>
             </Link>
           </Button>

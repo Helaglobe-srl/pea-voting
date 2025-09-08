@@ -78,7 +78,7 @@ export default async function ProfilePage() {
       
       <div className="flex gap-4">
         <Button asChild>
-          <Link href="/protected">Torna al Dashboard</Link>
+          <Link href="/protected">Torna alla Dashboard</Link>
         </Button>
       </div>
     </div>

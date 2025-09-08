@@ -270,12 +270,12 @@ export default async function ResultsPage() {
     <div className="flex-1 w-full flex flex-col gap-8">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">vincitori pea awards 2025</h1>
+          <h1 className="text-3xl font-bold">Vincitori pea awards 2025</h1>
         </div>
         <Button asChild variant="outline">
           <Link href="/protected/admin" className="flex items-center gap-2">
             <ArrowLeftIcon size={16} />
-            torna al dashboard
+            Torna alla dashboard
           </Link>
         </Button>
       </div>
@@ -295,7 +295,7 @@ export default async function ResultsPage() {
       <div className="space-y-8">
         <div className="flex items-center gap-3 mb-6">
           <TrophyIcon size={28} className="text-[#04516f]" />
-          <h2 className="text-2xl font-bold">vincitori per categoria</h2>
+          <h2 className="text-2xl font-bold">Vincitori per categoria</h2>
         </div>
 
         {categories.map(category => (
@@ -307,9 +307,22 @@ export default async function ResultsPage() {
             {categoryWinners[category] && categoryWinners[category].length > 0 ? (
               <div className="space-y-4">
                 {categoryWinners[category].map((winner) => (
-                  <div key={winner.project.id} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                  <div key={winner.project.id} className={`flex items-center justify-between p-4 rounded-lg ${
+                    winner.position === 1 ? 'bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800' :
+                    winner.position === 2 ? 'bg-gray-100 dark:bg-gray-800/30 border border-gray-200 dark:border-gray-700' :
+                    winner.position === 3 ? 'bg-orange-100 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800' :
+                    'bg-muted/50'
+                  }`}>
                     <div className="flex items-center gap-4">
-                      <Badge variant={winner.position === 1 ? "default" : "secondary"} className="text-lg px-3 py-1">
+                      <Badge 
+                        variant="secondary" 
+                        className={`text-lg px-3 py-1 font-bold ${
+                          winner.position === 1 ? 'bg-yellow-500 text-white hover:bg-yellow-600' :
+                          winner.position === 2 ? 'bg-gray-500 text-white hover:bg-gray-600' :
+                          winner.position === 3 ? 'bg-orange-500 text-white hover:bg-orange-600' :
+                          ''
+                        }`}
+                      >
                         {winner.position}°
                       </Badge>
                       <div>
@@ -349,7 +362,7 @@ export default async function ResultsPage() {
         <div className="space-y-6">
           <div className="flex items-center gap-3 mb-6">
             <StarIcon size={28} className="text-[#04516f]" />
-            <h2 className="text-2xl font-bold">menzioni speciali</h2>
+            <h2 className="text-2xl font-bold">Menzioni speciali</h2>
           </div>
 
           {specialMentions.map((mention, index) => (
