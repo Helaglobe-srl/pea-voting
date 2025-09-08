@@ -17,7 +17,6 @@ export async function AdminStatsCards() {
   const supabase = await createClient();
   
   // get admin email for filtering
-  const { data: sessionData } = await supabase.auth.getSession();
   const adminEmail = process.env.ADMIN_EMAIL;
 
   // parallel data fetching

@@ -49,7 +49,7 @@ export function AdminVotingMatrixClient({ initialData }: AdminVotingMatrixClient
   useEffect(() => {
     // use settimeout to allow the ui to render first
     setTimeout(() => {
-      const { votes, projects, criteria } = initialData;
+      const { votes, projects } = initialData;
 
       // get unique users from votes
       const userEmailMap = new Map<string, string>();
