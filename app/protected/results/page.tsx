@@ -357,6 +357,9 @@ export default async function ResultsPage() {
         ))}
       </div>
 
+      {/* section separator */}
+      <div className="h-px w-full bg-gray-200 dark:bg-gray-700"></div>
+
       {/* menzioni speciali */}
       {specialMentions.length > 0 && (
         <div className="space-y-6">

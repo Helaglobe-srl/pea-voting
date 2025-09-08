@@ -16,6 +16,14 @@ interface VoteWithEmailAndWeight {
   rappresenta_associazione: boolean;
 }
 
+interface Juror {
+  user_id: string;
+  email: string;
+  rappresenta_associazione: boolean;
+  nome: string | null;
+  cognome: string | null;
+}
+
 interface Project {
   id: number;
   name: string;
@@ -33,6 +41,7 @@ interface Criterion {
 interface AdminVotingMatrixClientProps {
   initialData: {
     votes: VoteWithEmailAndWeight[];
+    jurors: Juror[];
     projects: Project[];
     criteria: Criterion[];
   };
@@ -42,26 +51,22 @@ export function AdminVotingMatrixClient({ initialData }: AdminVotingMatrixClient
   const [isProcessing, setIsProcessing] = useState(true);
   const [processedData, setProcessedData] = useState<{
     projectsByCategory: Record<string, Project[]>;
-    regularUsers: { id: string; email: string }[];
+    regularUsers: { id: string; email: string; rappresenta_associazione: boolean; nome: string | null; cognome: string | null }[];
     voteMatrix: Map<string, Map<number, Map<number, number>>>;
   } | null>(null);
 
   useEffect(() => {
     // use settimeout to allow the ui to render first
     setTimeout(() => {
-      const { votes, projects } = initialData;
+      const { votes, jurors, projects } = initialData;
 
-      // get unique users from votes
-      const userEmailMap = new Map<string, string>();
-      votes.forEach(vote => {
-        if (vote.email) {
-          userEmailMap.set(vote.user_id, vote.email);
-        }
-      });
-      
-      const regularUsers = Array.from(userEmailMap.entries()).map(([userId, email]) => ({
-        id: userId,
-        email: email
+      // use all jurors instead of just those who voted
+      const regularUsers = jurors.map(juror => ({
+        id: juror.user_id,
+        email: juror.email,
+        rappresenta_associazione: juror.rappresenta_associazione,
+        nome: juror.nome,
+        cognome: juror.cognome
       }));
 
       // group projects by category and sort by organization_name
