@@ -1,24 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { AdminVotingMatrixClient } from "./admin-voting-matrix-client";
-
-interface VoteWithEmailAndWeight {
-  id: number;
-  user_id: string;
-  project_id: number;
-  criteria_id: number;
-  score: number;
-  created_at: string;
-  email: string;
-  rappresenta_associazione: boolean;
-}
-
-interface Juror {
-  user_id: string;
-  email: string;
-  rappresenta_associazione: boolean;
-  nome: string | null;
-  cognome: string | null;
-}
+import type { VoteWithEmailAndWeight, Juror } from "@/lib/types";
 
 export async function AdminVotingMatrix() {
   const supabase = await createClient();

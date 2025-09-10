@@ -7,39 +7,7 @@ import { useEffect, useState } from "react";
 import { VotingMatrixLoading } from "./admin-loading-skeleton";
 import { exportAdminVotingMatrix } from "@/lib/excel-export";
 import { FileSpreadsheetIcon } from "lucide-react";
-
-interface VoteWithEmailAndWeight {
-  id: number;
-  user_id: string;
-  project_id: number;
-  criteria_id: number;
-  score: number;
-  created_at: string;
-  email: string;
-  rappresenta_associazione: boolean;
-}
-
-interface Juror {
-  user_id: string;
-  email: string;
-  rappresenta_associazione: boolean;
-  nome: string | null;
-  cognome: string | null;
-}
-
-interface Project {
-  id: number;
-  name: string;
-  project_category: string | null;
-  organization_name?: string;
-  [key: string]: string | number | null | undefined;
-}
-
-interface Criterion {
-  id: number;
-  name: string;
-  description: string;
-}
+import type { VoteWithEmailAndWeight, Juror, Project, Criterion } from "@/lib/types";
 
 interface AdminVotingMatrixClientProps {
   initialData: {

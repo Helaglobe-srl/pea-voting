@@ -1,57 +1,12 @@
 import * as XLSX from 'xlsx';
-
-// types for export data
-interface VoteWithEmailAndWeight {
-  id: number;
-  user_id: string;
-  project_id: number;
-  criteria_id: number;
-  score: number;
-  created_at: string;
-  email: string;
-  rappresenta_associazione: boolean;
-}
-
-interface Project {
-  id: number;
-  name: string;
-  project_category?: string | null;
-  organization_name?: string;
-  jury_info?: string;
-  objectives_results?: string;
-  project_title?: string;
-  organization_type?: string;
-  therapeutic_area?: string;
-  presentation_link?: string;
-  [key: string]: string | number | null | undefined;
-}
-
-interface Criterion {
-  id: number;
-  name: string;
-  description: string;
-}
-
-interface Juror {
-  user_id: string;
-  email: string;
-  rappresenta_associazione: boolean;
-  nome: string | null;
-  cognome: string | null;
-}
-
-interface CategoryWinner {
-  position: number;
-  project: Project;
-  averageScore: number;
-}
-
-interface SpecialMention {
-  type: 'Giuria Tecnica' | 'Insieme Per' | 'Impatto Sociale';
-  project: Project;
-  score: number;
-  description: string;
-}
+import type { 
+  VoteWithEmailAndWeight, 
+  Project, 
+  Criterion, 
+  Juror, 
+  CategoryWinner, 
+  SpecialMention 
+} from './types';
 
 // utility function to create excel file and download
 const downloadExcel = (workbook: XLSX.WorkBook, filename: string) => {
@@ -138,7 +93,7 @@ export const exportAdminVotingMatrix = (
 
   // create worksheet for each category
   Object.entries(projectsByCategory).forEach(([category, categoryProjects]) => {
-    const worksheetData: any[][] = [];
+    const worksheetData: (string | number)[][] = [];
     
     // headers
     const headers = [
@@ -208,7 +163,7 @@ export const exportAdminVotingMatrix = (
   });
 
   // create summary worksheet with all votes
-  const summaryData: any[][] = [];
+  const summaryData: (string | number)[][] = [];
   summaryData.push([
     'giurato',
     'email',
@@ -279,7 +234,7 @@ export const exportResultsData = (
   const workbook = XLSX.utils.book_new();
 
   // create winners worksheet
-  const winnersData: any[][] = [];
+  const winnersData: (string | number)[][] = [];
   winnersData.push([
     'categoria',
     'posizione',
@@ -314,7 +269,7 @@ export const exportResultsData = (
   XLSX.utils.book_append_sheet(workbook, winnersWorksheet, 'vincitori per categoria');
 
   // create special mentions worksheet
-  const mentionsData: any[][] = [];
+  const mentionsData: (string | number)[][] = [];
   mentionsData.push([
     'tipo menzione',
     'progetto',
@@ -347,7 +302,7 @@ export const exportResultsData = (
   XLSX.utils.book_append_sheet(workbook, mentionsWorksheet, 'menzioni speciali');
 
   // create summary worksheet
-  const summaryData: any[][] = [];
+  const summaryData: (string | number)[][] = [];
   summaryData.push(['statistiche generali', '']);
   summaryData.push(['giurati votanti', uniqueVoterCount]);
   summaryData.push(['voti totali', totalVotes]);

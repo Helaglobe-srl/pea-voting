@@ -6,47 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChartBarIcon, ArrowLeftIcon, TrophyIcon, AwardIcon, StarIcon } from "lucide-react";
 import { ResultsExportButton } from "@/components/results-export-button";
-
-interface VoteWithEmailAndWeight {
-  id: number;
-  user_id: string;
-  project_id: number;
-  criteria_id: number;
-  score: number;
-  created_at: string;
-  email: string;
-  rappresenta_associazione: boolean;
-}
-
-// interface for project data
-interface Project {
-  id: number;
-  name: string;
-  jury_info?: string;
-  objectives_results?: string;
-  organization_name?: string;
-  project_title?: string;
-  project_category?: string;
-  organization_type?: string;
-  therapeutic_area?: string;
-  presentation_link?: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-// interface for winners
-interface CategoryWinner {
-  position: number;
-  project: Project;
-  averageScore: number;
-}
-
-interface SpecialMention {
-  type: 'Giuria Tecnica' | 'Insieme Per' | 'Impatto Sociale';
-  project: Project;
-  score: number;
-  description: string;
-}
+import type { VoteWithEmailAndWeight, CategoryWinner, SpecialMention } from "@/lib/types";
 
 // helper function to truncate text
 const truncateText = (text: string, maxLength: number = 150): string => {

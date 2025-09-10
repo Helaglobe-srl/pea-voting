@@ -3,34 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { FileSpreadsheetIcon } from "lucide-react";
 import { exportResultsData } from "@/lib/excel-export";
-
-interface Project {
-  id: number;
-  name: string;
-  jury_info?: string;
-  objectives_results?: string;
-  organization_name?: string;
-  project_title?: string;
-  project_category?: string;
-  organization_type?: string;
-  therapeutic_area?: string;
-  presentation_link?: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-interface CategoryWinner {
-  position: number;
-  project: Project;
-  averageScore: number;
-}
-
-interface SpecialMention {
-  type: 'Giuria Tecnica' | 'Insieme Per' | 'Impatto Sociale';
-  project: Project;
-  score: number;
-  description: string;
-}
+import type { CategoryWinner, SpecialMention } from "@/lib/types";
 
 interface ResultsExportButtonProps {
   categoryWinners: { [category: string]: CategoryWinner[] };
@@ -56,3 +29,4 @@ export function ResultsExportButton({
     </Button>
   );
 }
+
