@@ -2,8 +2,11 @@
 
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { VotingMatrixLoading } from "./admin-loading-skeleton";
+import { exportAdminVotingMatrix } from "@/lib/excel-export";
+import { FileSpreadsheetIcon } from "lucide-react";
 
 interface VoteWithEmailAndWeight {
   id: number;
@@ -118,7 +121,12 @@ export function AdminVotingMatrixClient({ initialData }: AdminVotingMatrixClient
   }
 
   const { projectsByCategory, regularUsers, voteMatrix } = processedData;
-  const { criteria } = initialData;
+  const { criteria, votes, jurors, projects } = initialData;
+
+  // handle excel export
+  const handleExportToExcel = () => {
+    exportAdminVotingMatrix(votes, jurors, projects, criteria);
+  };
 
   // get individual criteria scores for a user-project combination
   const getIndividualScores = (userId: string, projectId: number): { [criteriaId: number]: number } | null => {
@@ -163,10 +171,19 @@ export function AdminVotingMatrixClient({ initialData }: AdminVotingMatrixClient
 
   return (
     <>
+      {/* export button */}
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">📊 Matrice di votazione</h2>
+        <Button onClick={handleExportToExcel} variant="outline" className="flex items-center gap-2">
+          <FileSpreadsheetIcon size={16} />
+          Esporta Excel
+        </Button>
+      </div>
+
       {/* voting matrix tables by category */}
       {Object.entries(projectsByCategory).map(([category, categoryProjects]) => (
         <Card key={category} className="p-6">
-          <h2 className="text-xl font-semibold mb-6">📊 {category}</h2>
+          <h3 className="text-xl font-semibold mb-6">📊 {category}</h3>
           
           {/* mobile-first responsive table */}
           <div className="block lg:hidden">

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChartBarIcon, ArrowLeftIcon, TrophyIcon, AwardIcon, StarIcon } from "lucide-react";
+import { ResultsExportButton } from "@/components/results-export-button";
 
 interface VoteWithEmailAndWeight {
   id: number;
@@ -272,12 +273,20 @@ export default async function ResultsPage() {
         <div>
           <h1 className="text-3xl font-bold">Vincitori pea awards 2025</h1>
         </div>
-        <Button asChild variant="outline">
-          <Link href="/protected/admin" className="flex items-center gap-2">
-            <ArrowLeftIcon size={16} />
-            Torna alla dashboard
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <ResultsExportButton 
+            categoryWinners={categoryWinners}
+            specialMentions={specialMentions}
+            uniqueVoterCount={uniqueVoterCount}
+            totalVotes={normalUserVotes.length}
+          />
+          <Button asChild variant="outline">
+            <Link href="/protected/admin" className="flex items-center gap-2">
+              <ArrowLeftIcon size={16} />
+              Torna alla dashboard
+            </Link>
+          </Button>
+        </div>
       </div>
 
       <div className="bg-[#ffea1d]/10 dark:bg-[#ffea1d] p-4 rounded-md flex flex-col gap-2 border border-[#ffea1d]/20">
