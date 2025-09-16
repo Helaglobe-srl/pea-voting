@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { Card } from "@/components/ui/card";
-import { UsersIcon, BarChart3Icon } from "lucide-react";
+import { UsersIcon, BarChart3Icon, VoteIcon } from "lucide-react";
 
 interface VoteWithEmailAndWeight {
   id: number;
@@ -47,9 +47,22 @@ export async function AdminStatsCards() {
   const giuratiVotanti = usersWhoVoted.size;
   const rappresentantiAssociazioni = associationUsers.size;
   const giuratiIndividuali = individualUsers.size;
+  const totalVotes = regularUserVotes.length;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* first row: progetti totali, giurati totali, voti totali */}
+      <Card className="p-4">
+        <div className="flex items-center gap-3">
+          <div className="h-8 w-8 bg-[#04516f] rounded flex items-center justify-center text-white text-sm font-bold">
+            P
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Progetti totali</p>
+            <p className="text-2xl font-bold">{projects.length}</p>
+          </div>
+        </div>
+      </Card>
       <Card className="p-4">
         <div className="flex items-center gap-3">
           <UsersIcon className="h-8 w-8 text-[#04516f]" />
@@ -59,6 +72,17 @@ export async function AdminStatsCards() {
           </div>
         </div>
       </Card>
+      <Card className="p-4">
+        <div className="flex items-center gap-3">
+          <VoteIcon className="h-8 w-8 text-purple-600" />
+          <div>
+            <p className="text-sm text-muted-foreground">Voti totali</p>
+            <p className="text-2xl font-bold">{totalVotes}</p>
+          </div>
+        </div>
+      </Card>
+      
+      {/* second row: remaining cards */}
       <Card className="p-4">
         <div className="flex items-center gap-3">
           <BarChart3Icon className="h-8 w-8 text-[#ffea1d]" />
@@ -89,17 +113,6 @@ export async function AdminStatsCards() {
             <p className="text-sm text-muted-foreground">Giurati individuali</p>
             <p className="text-2xl font-bold">{giuratiIndividuali}</p>
             <p className="text-xs text-muted-foreground">(peso 40%)</p>
-          </div>
-        </div>
-      </Card>
-      <Card className="p-4">
-        <div className="flex items-center gap-3">
-          <div className="h-8 w-8 bg-[#04516f] rounded flex items-center justify-center text-white text-sm font-bold">
-            P
-          </div>
-          <div>
-            <p className="text-sm text-muted-foreground">Progetti totali</p>
-            <p className="text-2xl font-bold">{projects.length}</p>
           </div>
         </div>
       </Card>
