@@ -6,6 +6,11 @@ import { UserIcon, AlertCircleIcon, CheckCircleIcon, ChevronLeftIcon, ChevronRig
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
+interface UserVote {
+  project_id: number;
+  criteria_id: number;
+}
+
 // helper function to truncate text
 const truncateText = (text: string, maxLength: number = 150): string => {
   if (text.length <= maxLength) return text;
@@ -69,7 +74,7 @@ export default async function ProtectedPage({ searchParams }: { searchParams: Pr
   // Function to check if user has completed voting for a project
   const hasCompletedVoting = (projectId: number) => {
     if (!userVotes) return false;
-    const projectVotes = userVotes.filter(vote => vote.project_id === projectId);
+    const projectVotes = (userVotes as UserVote[]).filter((vote: UserVote) => vote.project_id === projectId);
     return projectVotes.length === totalCriteria;
   };
 
