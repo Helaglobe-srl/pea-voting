@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { Card } from "@/components/ui/card";
 import { UsersIcon, BarChart3Icon, VoteIcon } from "lucide-react";
+import Link from "next/link";
 
 interface VoteWithEmailAndWeight {
   id: number;
@@ -63,15 +64,17 @@ export async function AdminStatsCards() {
           </div>
         </div>
       </Card>
-      <Card className="p-4">
-        <div className="flex items-center gap-3">
-          <UsersIcon className="h-8 w-8 text-[#04516f]" />
-          <div>
-            <p className="text-sm text-muted-foreground">Giurati totali</p>
-            <p className="text-2xl font-bold">{totalJurors}</p>
+      <Link href="/protected/admin/jurors">
+        <Card className="p-4 hover:bg-muted/50 transition-colors cursor-pointer">
+          <div className="flex items-center gap-3">
+            <UsersIcon className="h-8 w-8 text-[#04516f]" />
+            <div>
+              <p className="text-sm text-muted-foreground">Giurati totali</p>
+              <p className="text-2xl font-bold">{totalJurors}</p>
+            </div>
           </div>
-        </div>
-      </Card>
+        </Card>
+      </Link>
       <Card className="p-4">
         <div className="flex items-center gap-3">
           <VoteIcon className="h-8 w-8 text-purple-600" />
