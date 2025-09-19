@@ -49,9 +49,7 @@ export default async function ProtectedPage({ searchParams }: { searchParams: Pr
 
   // Get user's votes to check which projects they've already voted on
   const { data: userVotes, error: votesError } = await supabase
-    .from("votes")
-    .select("project_id, criteria_id")
-    .eq("user_id", sessionData.session.user.id);
+    .rpc('get_user_votes');
 
   if (votesError) {
     console.error("Error fetching user votes:", votesError);
