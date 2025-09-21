@@ -10,8 +10,8 @@ import { SupabaseClient } from "@supabase/supabase-js";
 export async function fetchAllRpcResults<T>(
   supabase: SupabaseClient,
   rpcName: string,
-  params?: Record<string, any>
-): Promise<{ data: T[] | null; error: any }> {
+  params?: Record<string, unknown>
+): Promise<{ data: T[] | null; error: unknown }> {
   let allResults: T[] = [];
   let offset = 0;
   const batchSize = 1000;
