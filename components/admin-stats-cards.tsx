@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Card } from "@/components/ui/card";
 import { UsersIcon, BarChart3Icon, VoteIcon } from "lucide-react";
 import Link from "next/link";
+import { fetchAllRpcResults } from "@/lib/supabase-utils";
 
 interface VoteWithEmailAndWeight {
   id: number;
@@ -22,12 +23,16 @@ export async function AdminStatsCards() {
 
   // parallel data fetching
   const [votesResult, usersCountResult, projectsResult] = await Promise.all([
-    supabase.rpc('get_votes_with_emails_and_weights'),
+    fetchAllRpcResults<VoteWithEmailAndWeight>(supabase, 'get_votes_with_emails_and_weights_admin'),
     supabase.rpc('get_total_users_count', { admin_email_param: adminEmail }),
     supabase.from("projects").select("*").order("id")
   ]);
 
-  const regularUserVotes = (votesResult.data as VoteWithEmailAndWeight[]) || [];
+  if (votesResult.error) {
+    console.error("Error fetching admin votes:", votesResult.error);
+  }
+
+  const regularUserVotes = votesResult.data || [];
   const totalJurors = (usersCountResult.data as number) || 0;
   const projects = projectsResult.data || [];
 

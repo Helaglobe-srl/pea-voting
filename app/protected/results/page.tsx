@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChartBarIcon, ArrowLeftIcon, TrophyIcon, AwardIcon, StarIcon } from "lucide-react";
 import { ResultsExportButton } from "@/components/results-export-button";
+import { fetchAllRpcResults } from "@/lib/supabase-utils";
 import type { VoteWithEmailAndWeight, CategoryWinner, SpecialMention } from "@/lib/types";
 
 // helper function to truncate text
@@ -31,14 +32,16 @@ export default async function ResultsPage() {
   }
 
   // get all votes with user emails and flags (excluding admin)
-  const { data: votesWithEmails, error: votesError } = await supabase
-    .rpc('get_votes_with_emails_and_weights');
+  const { data: votesWithEmails, error: votesError } = await fetchAllRpcResults<VoteWithEmailAndWeight>(
+    supabase, 
+    'get_votes_with_emails_and_weights_admin'
+  );
 
   if (votesError) {
     console.error("Error fetching votes with emails and weights:", votesError);
   }
 
-  const normalUserVotes = (votesWithEmails as VoteWithEmailAndWeight[]) || [];
+  const normalUserVotes = votesWithEmails || [];
 
   // fetch projects and criteria
   const { data: projects, error: projectsError } = await supabase
