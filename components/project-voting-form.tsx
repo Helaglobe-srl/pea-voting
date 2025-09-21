@@ -82,19 +82,11 @@ export default function ProjectVotingForm({ projectId, criteria, existingVotes, 
       }
       
       setMessage("i tuoi voti sono stati inviati con successo!");
-      // Refresh the page data
-      router.refresh();
       
-      // Show popup if there's a next project, otherwise redirect after delay
-      if (nextProjectId) {
-        setTimeout(() => {
-          setShowNextProjectPopup(true);
-        }, 1500);
-      } else {
-        setTimeout(() => {
-          router.push("/protected");
-        }, 1500);
-      }
+      // Show popup after a brief delay
+      setTimeout(() => {
+        setShowNextProjectPopup(true);
+      }, 1500);
     } catch (error) {
       console.error("Error submitting votes:", error);
       setMessage("si è verificato un errore durante l&apos;invio dei voti. riprova.");
@@ -103,9 +95,64 @@ export default function ProjectVotingForm({ projectId, criteria, existingVotes, 
     }
   };
 
-  const handleGoToNextProject = () => {
+  const handleGoToNextProject = async () => {
     setShowNextProjectPopup(false);
-    router.push(`/protected/vote/${nextProjectId}`);
+    
+    // If we have a pre-calculated nextProjectId, use it
+    if (nextProjectId) {
+      router.push(`/protected/vote/${nextProjectId}`);
+      return;
+    }
+    
+    // Otherwise, let's find the next unvoted project
+    try {
+      const supabase = createClient();
+      
+      // Get all projects
+      const { data: allProjects } = await supabase
+        .from("projects")
+        .select("id")
+        .order("id");
+      
+      // Get all user's votes to check completion status
+      const { data: allUserVotes } = await supabase
+        .from("votes")
+        .select("project_id, criteria_id")
+        .eq("user_id", userId);
+      
+      // Get total criteria count
+      const { data: criteria } = await supabase
+        .from("voting_criteria")
+        .select("id");
+      
+      const totalCriteria = criteria?.length || 3;
+      
+      // Function to check if user has completed voting for a project
+      const hasCompletedVoting = (checkProjectId: number) => {
+        if (!allUserVotes) return false;
+        const projectVotes = allUserVotes.filter(vote => vote.project_id === checkProjectId);
+        return projectVotes.length === totalCriteria;
+      };
+      
+      // Find unvoted projects (excluding current project)
+      const unvotedProjects = allProjects?.filter(p => 
+        p.id !== projectId && !hasCompletedVoting(p.id)
+      ) || [];
+      
+      if (unvotedProjects.length > 0) {
+        // Sort by ID and get the first unvoted project
+        const sortedUnvotedProjects = unvotedProjects.sort((a, b) => a.id - b.id);
+        const calculatedNextProjectId = sortedUnvotedProjects[0].id;
+        router.push(`/protected/vote/${calculatedNextProjectId}`);
+      } else {
+        // No more projects to vote on
+        router.push("/protected");
+      }
+    } catch (error) {
+      console.error("Error finding next project:", error);
+      // Fallback to projects page
+      router.push("/protected");
+    }
   };
 
   const handleGoToProjectsPage = () => {
@@ -162,10 +209,10 @@ export default function ProjectVotingForm({ projectId, criteria, existingVotes, 
           <Card className="max-w-md mx-4 p-6">
             <div className="text-center">
               <h3 className="text-lg font-semibold mb-4">
-                proseguire al progetto successivo?
+                cosa vuoi fare ora?
               </h3>
               <p className="text-sm text-muted-foreground mb-6">
-                vuoi continuare a votare il prossimo progetto che non hai ancora votato o tornare alla lista generale?
+                vuoi continuare a votare il prossimo progetto disponibile o tornare alla lista per scegliere tu?
               </p>
               <div className="flex gap-3 justify-center">
                 <Button onClick={handleGoToProjectsPage} variant="outline">

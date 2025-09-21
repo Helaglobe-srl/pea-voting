@@ -76,13 +76,16 @@ export default async function VotePage({ params }: { params: Promise<{ id: strin
     return projectVotes.length === totalCriteria;
   };
 
-  // Find the minimum project ID among those that the user hasn't completed voting on yet
+  // Find the next project ID among those that the user hasn't completed voting on yet
   // Exclude the current project since they're about to vote on it
   const unvotedProjects = allProjects?.filter(p => 
     p.id !== projectId && !hasCompletedVoting(p.id)
   ) || [];
-  const nextProjectId = unvotedProjects.length > 0 ? 
-    Math.min(...unvotedProjects.map(p => p.id)) : undefined;
+  
+  // Sort by ID and get the next one after the current project, or the first unvoted one
+  const sortedUnvotedProjects = unvotedProjects.sort((a, b) => a.id - b.id);
+  const nextProjectId = sortedUnvotedProjects.length > 0 ? sortedUnvotedProjects[0].id : undefined;
+  
 
   return (
     <div className="flex-1 w-full flex flex-col gap-8">
