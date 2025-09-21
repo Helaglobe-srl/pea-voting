@@ -17,26 +17,78 @@ import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { validateEmail, getEmailValidationMessage } from "@/lib/email-validation";
 
 export function SignUpForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   const [email, setEmail] = useState("");
+  const [confirmEmail, setConfirmEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const [rappresentaAssociazione, setRappresentaAssociazione] = useState("no");
   const [error, setError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newEmail = e.target.value;
+    setEmail(newEmail);
+    
+    // validate email format
+    if (newEmail.trim()) {
+      const validation = validateEmail(newEmail);
+      if (!validation.isValid) {
+        setEmailError(getEmailValidationMessage(validation));
+      } else {
+        // check if emails match when both are filled
+        if (confirmEmail && newEmail !== confirmEmail) {
+          setEmailError("le email non corrispondono");
+        } else {
+          setEmailError(null);
+        }
+      }
+    } else {
+      setEmailError(null);
+    }
+  };
+
+  const handleConfirmEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newConfirmEmail = e.target.value;
+    setConfirmEmail(newConfirmEmail);
+    
+    // check if emails match
+    if (newConfirmEmail && email && newConfirmEmail !== email) {
+      setEmailError("le email non corrispondono");
+    } else if (email && newConfirmEmail === email) {
+      setEmailError(null);
+    }
+  };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     const supabase = createClient();
     setIsLoading(true);
     setError(null);
+
+    // validate email before submission
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.isValid) {
+      setEmailError(getEmailValidationMessage(emailValidation));
+      setIsLoading(false);
+      return;
+    }
+
+    // check if emails match
+    if (email !== confirmEmail) {
+      setEmailError("le email non corrispondono");
+      setIsLoading(false);
+      return;
+    }
 
     if (password !== repeatPassword) {
       setError("Le password non corrispondono");
@@ -87,8 +139,24 @@ export function SignUpForm({
                   placeholder="m@example.com"
                   required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={handleEmailChange}
+                  className={emailError && !confirmEmail ? "border-red-500 focus:border-red-500" : ""}
                 />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="confirm-email">Conferma Email</Label>
+                <Input
+                  id="confirm-email"
+                  type="email"
+                  placeholder="Ripeti la tua email"
+                  required
+                  value={confirmEmail}
+                  onChange={handleConfirmEmailChange}
+                  className={emailError && confirmEmail ? "border-red-500 focus:border-red-500" : ""}
+                />
+                {emailError && (
+                  <p className="text-sm text-red-500 mt-1">{emailError}</p>
+                )}
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">
