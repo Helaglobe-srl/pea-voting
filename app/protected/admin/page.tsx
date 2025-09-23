@@ -47,8 +47,8 @@ export default async function AdminDashboard() {
           <Button asChild variant="outline" size="sm" className="flex-1 sm:flex-none">
             <Link href="/protected/results" className="flex items-center justify-center gap-2">
               <BarChart3Icon size={16} />
-              <span className="hidden xs:inline">Risultati</span>
-              <span className="xs:hidden">risultati</span>
+              <span className="hidden xs:inline">Vincitori</span>
+              <span className="xs:hidden">vincitori</span>
             </Link>
           </Button>
         </div>
