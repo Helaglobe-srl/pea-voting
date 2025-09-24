@@ -232,21 +232,22 @@ export default async function ResultsPage() {
 
   return (
     <div className="flex-1 w-full flex flex-col gap-8">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Vincitori pea awards 2025</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">vincitori pea awards 2025</h1>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col xs:flex-row gap-2 w-full sm:w-auto">
           <ResultsExportButton 
             categoryWinners={categoryWinners}
             specialMentions={specialMentions}
             uniqueVoterCount={uniqueVoterCount}
             totalVotes={normalUserVotes.length}
           />
-          <Button asChild variant="outline">
-            <Link href="/protected/admin" className="flex items-center gap-2">
+          <Button asChild variant="outline" className="flex-1 xs:flex-none">
+            <Link href="/protected/admin" className="flex items-center justify-center gap-2">
               <ArrowLeftIcon size={16} />
-              Torna alla dashboard
+              <span className="hidden xs:inline">torna alla dashboard</span>
+              <span className="xs:hidden">indietro</span>
             </Link>
           </Button>
         </div>
@@ -258,7 +259,12 @@ export default async function ResultsPage() {
           <div className="text-[#04516f]">
             <span className="font-medium">giurati votanti: </span>
             <span>{uniqueVoterCount}</span>
-            <span className="text-[#04516f]/70 ml-2">({normalUserVotes.length} voti totali)</span>
+            <span className="text-[#04516f]/70 ml-2 hidden xs:inline">({normalUserVotes.length} voti totali)</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 xs:hidden pl-7">
+          <div className="text-[#04516f]/70">
+            <span>({normalUserVotes.length} voti totali)</span>
           </div>
         </div>
       </div>
@@ -271,7 +277,7 @@ export default async function ResultsPage() {
         </div>
 
         {categories.map(category => (
-          <Card key={category} className="p-6">
+          <Card key={category} className="p-4 sm:p-6">
             <h3 className="text-xl font-bold mb-4 text-[#04516f]">
               {category.toLowerCase()}
             </h3>
@@ -279,16 +285,16 @@ export default async function ResultsPage() {
             {categoryWinners[category] && categoryWinners[category].length > 0 ? (
               <div className="space-y-4">
                 {categoryWinners[category].map((winner) => (
-                  <div key={winner.project.id} className={`flex items-center justify-between p-4 rounded-lg ${
+                  <div key={winner.project.id} className={`flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 rounded-lg ${
                     winner.position === 1 ? 'bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800' :
                     winner.position === 2 ? 'bg-gray-100 dark:bg-gray-800/30 border border-gray-200 dark:border-gray-700' :
                     winner.position === 3 ? 'bg-orange-100 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800' :
                     'bg-muted/50'
                   }`}>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-start gap-4">
                       <Badge 
                         variant="secondary" 
-                        className={`text-lg px-3 py-1 font-bold ${
+                        className={`text-lg px-3 py-1 font-bold mt-1 ${
                           winner.position === 1 ? 'bg-yellow-500 text-white hover:bg-yellow-600' :
                           winner.position === 2 ? 'bg-gray-500 text-white hover:bg-gray-600' :
                           winner.position === 3 ? 'bg-orange-500 text-white hover:bg-orange-600' :
@@ -297,7 +303,7 @@ export default async function ResultsPage() {
                       >
                         {winner.position}°
                       </Badge>
-                      <div>
+                      <div className="flex-1">
                         <Link 
                           href={`/protected/admin/project/${winner.project.id}`}
                           className="text-lg font-semibold text-[#04516f] hover:text-[#033d5a] dark:text-[#6ba3c7] dark:hover:text-[#8bb8d4] underline hover:no-underline transition-colors"
@@ -314,7 +320,7 @@ export default async function ResultsPage() {
                         </p>
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="mt-3 sm:mt-0 sm:text-right">
                       <div className="text-xl font-bold">
                         {winner.averageScore} <span className="text-sm text-muted-foreground">/ 5</span>
                       </div>
@@ -341,8 +347,8 @@ export default async function ResultsPage() {
           </div>
 
           {specialMentions.map((mention, index) => (
-            <Card key={index} className="p-6 border-l-4 border-l-[#ffea1d]">
-              <div className="flex items-start justify-between">
+            <Card key={index} className="p-4 sm:p-6 border-l-4 border-l-[#ffea1d]">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <AwardIcon size={20} className="text-[#04516f]" />
@@ -368,7 +374,7 @@ export default async function ResultsPage() {
                     )}
                   </p>
                 </div>
-                <div className="text-right ml-4">
+                <div className="mt-4 sm:mt-0 sm:text-right sm:ml-4">
                   <div className="text-xl font-bold">
                     {mention.score} <span className="text-sm text-muted-foreground">/ 5</span>
                   </div>

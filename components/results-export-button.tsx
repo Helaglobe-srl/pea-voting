@@ -23,9 +23,10 @@ export function ResultsExportButton({
   };
 
   return (
-    <Button onClick={handleExportToExcel} variant="outline" className="flex items-center gap-2">
+    <Button onClick={handleExportToExcel} variant="outline" className="flex items-center justify-center gap-2 flex-1 xs:flex-none">
       <FileSpreadsheetIcon size={16} />
-      Esporta Excel
+      <span className="hidden xs:inline">esporta excel</span>
+      <span className="xs:hidden">esporta</span>
     </Button>
   );
 }
