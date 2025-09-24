@@ -80,7 +80,8 @@ export default async function JurorsPage() {
             <Button asChild variant="ghost" size="sm">
               <Link href="/protected/admin" className="flex items-center gap-2">
                 <ArrowLeftIcon size={16} />
-                Torna al pannello
+                <span className="hidden xs:inline">torna al pannello</span>
+                <span className="xs:hidden">indietro</span>
               </Link>
             </Button>
           </div>
@@ -125,18 +126,18 @@ export default async function JurorsPage() {
       </div>
 
       {/* jurors who voted */}
-      <Card className="p-6">
+      <Card className="p-4 sm:p-6">
         <div className="flex items-center gap-3 mb-6">
           <CheckCircleIcon className="h-6 w-6 text-green-600" />
           <h2 className="text-xl font-semibold">Giurati che hanno votato ({jurorsWhoVoted.length})</h2>
         </div>
         
         {jurorsWhoVoted.length === 0 ? (
-          <p className="text-muted-foreground text-center py-8">Nessun giurato ha ancora votato.</p>
+          <p className="text-muted-foreground text-center py-8">nessun giurato ha ancora votato.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
-              <thead>
+              <thead className="hidden sm:table-header-group">
                 <tr className="border-b">
                   <th className="text-left p-3 font-semibold">Email</th>
                   <th className="text-left p-3 font-semibold">Nome</th>
@@ -146,11 +147,21 @@ export default async function JurorsPage() {
               </thead>
               <tbody>
                 {jurorsWhoVoted.map((juror) => (
-                  <tr key={juror.user_id} className="border-b hover:bg-muted/50">
-                    <td className="p-3">{juror.email}</td>
-                    <td className="p-3">{juror.nome || '-'}</td>
-                    <td className="p-3">{juror.cognome || '-'}</td>
+                  <tr key={juror.user_id} className="border-b hover:bg-muted/50 sm:table-row flex flex-col sm:flex-row">
+                    <td className="p-3 sm:border-b-0 border-b">
+                      <span className="font-medium sm:hidden">Email: </span>
+                      {juror.email}
+                    </td>
+                    <td className="p-3 sm:border-b-0 border-b">
+                      <span className="font-medium sm:hidden">Nome: </span>
+                      {juror.nome || '-'}
+                    </td>
+                    <td className="p-3 sm:border-b-0 border-b">
+                      <span className="font-medium sm:hidden">Cognome: </span>
+                      {juror.cognome || '-'}
+                    </td>
                     <td className={`p-3 font-medium ${getUserTypeColor(juror.rappresenta_associazione)}`}>
+                      <span className="font-medium sm:hidden">Tipo: </span>
                       {getUserType(juror.rappresenta_associazione)}
                     </td>
                   </tr>
@@ -162,18 +173,18 @@ export default async function JurorsPage() {
       </Card>
 
       {/* jurors who did not vote */}
-      <Card className="p-6">
+      <Card className="p-4 sm:p-6">
         <div className="flex items-center gap-3 mb-6">
           <XCircleIcon className="h-6 w-6 text-red-600" />
           <h2 className="text-xl font-semibold">Giurati che non hanno votato ({jurorsWhoDidNotVote.length})</h2>
         </div>
         
         {jurorsWhoDidNotVote.length === 0 ? (
-          <p className="text-muted-foreground text-center py-8">Tutti i giurati hanno votato! 🎉</p>
+          <p className="text-muted-foreground text-center py-8">tutti i giurati hanno votato! 🎉</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
-              <thead>
+              <thead className="hidden sm:table-header-group">
                 <tr className="border-b">
                   <th className="text-left p-3 font-semibold">Email</th>
                   <th className="text-left p-3 font-semibold">Nome</th>
@@ -183,11 +194,21 @@ export default async function JurorsPage() {
               </thead>
               <tbody>
                 {jurorsWhoDidNotVote.map((juror) => (
-                  <tr key={juror.user_id} className="border-b hover:bg-muted/50">
-                    <td className="p-3">{juror.email}</td>
-                    <td className="p-3">{juror.nome || '-'}</td>
-                    <td className="p-3">{juror.cognome || '-'}</td>
+                  <tr key={juror.user_id} className="border-b hover:bg-muted/50 sm:table-row flex flex-col sm:flex-row">
+                    <td className="p-3 sm:border-b-0 border-b">
+                      <span className="font-medium sm:hidden">Email: </span>
+                      {juror.email}
+                    </td>
+                    <td className="p-3 sm:border-b-0 border-b">
+                      <span className="font-medium sm:hidden">Nome: </span>
+                      {juror.nome || '-'}
+                    </td>
+                    <td className="p-3 sm:border-b-0 border-b">
+                      <span className="font-medium sm:hidden">Cognome: </span>
+                      {juror.cognome || '-'}
+                    </td>
                     <td className={`p-3 font-medium ${getUserTypeColor(juror.rappresenta_associazione)}`}>
+                      <span className="font-medium sm:hidden">Tipo: </span>
                       {getUserType(juror.rappresenta_associazione)}
                     </td>
                   </tr>
