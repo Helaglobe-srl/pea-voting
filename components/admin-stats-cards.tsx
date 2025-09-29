@@ -54,6 +54,7 @@ export async function AdminStatsCards() {
   const rappresentantiAssociazioni = associationUsers.size;
   const giuratiIndividuali = individualUsers.size;
   const totalVotes = regularUserVotes.length;
+  const votesPerProject = Math.round(totalVotes / 3); // divide by 3 since each project has 3 criteria votes
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -85,7 +86,7 @@ export async function AdminStatsCards() {
           <VoteIcon className="h-8 w-8 text-purple-600" />
           <div>
             <p className="text-sm text-muted-foreground">Voti totali</p>
-            <p className="text-2xl font-bold">{totalVotes}</p>
+            <p className="text-2xl font-bold">{votesPerProject}</p>
           </div>
         </div>
       </Card>
