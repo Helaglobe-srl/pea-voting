@@ -8,18 +8,14 @@ import type { CategoryWinner, SpecialMention } from "@/lib/types";
 interface ResultsExportButtonProps {
   categoryWinners: { [category: string]: CategoryWinner[] };
   specialMentions: SpecialMention[];
-  uniqueVoterCount: number;
-  totalVotes: number;
 }
 
 export function ResultsExportButton({ 
   categoryWinners, 
-  specialMentions, 
-  uniqueVoterCount, 
-  totalVotes 
+  specialMentions
 }: ResultsExportButtonProps) {
   const handleExportToExcel = () => {
-    exportResultsData(categoryWinners, specialMentions, uniqueVoterCount, totalVotes);
+    exportResultsData(categoryWinners, specialMentions);
   };
 
   return (

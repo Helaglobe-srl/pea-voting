@@ -98,7 +98,7 @@ export function AdminVotingMatrixClient({ initialData }: AdminVotingMatrixClient
 
   // handle projects summary export
   const handleExportProjectsSummary = () => {
-    exportProjectsSummary(votes, jurors, projects, criteria);
+    exportProjectsSummary(votes, jurors, projects);
   };
 
   // get individual criteria scores for a user-project combination
