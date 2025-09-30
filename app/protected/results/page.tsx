@@ -131,10 +131,10 @@ export default async function ResultsPage() {
       averageScore: calculateProjectAverage(project.id)
     })).filter(p => p.averageScore > 0);
 
-    // sort by average score descending and take top 3
+    // sort by average score descending and take top 5
     const sortedProjects = projectsWithScores
       .sort((a, b) => b.averageScore - a.averageScore)
-      .slice(0, 3);
+      .slice(0, 5);
 
     categoryWinners[category] = sortedProjects.map((p, index) => ({
       position: index + 1,
@@ -146,39 +146,47 @@ export default async function ResultsPage() {
   // calculate special mentions
   const specialMentions: SpecialMention[] = [];
 
-  // 1. menzione speciale giuria tecnica (rappresenta_associazione = false)
+  // 1. menzione speciale giuria tecnica (rappresenta_associazione = false) - top 5
   const technicalJuryProjects = (projects || []).map(project => ({
     project,
     score: calculateProjectAverage(project.id, vote => !vote.rappresenta_associazione)
   })).filter(p => p.score > 0);
 
   if (technicalJuryProjects.length > 0) {
-    const topTechnical = technicalJuryProjects
-      .sort((a, b) => b.score - a.score)[0];
+    const topTechnicalProjects = technicalJuryProjects
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5);
     
-    specialMentions.push({
-      type: 'Giuria Tecnica',
-      project: topTechnical.project,
-      score: parseFloat(topTechnical.score.toFixed(1)),
-      description: 'progetto con la media più alta sui tre criteri dai soli giurati della giuria tecnica'
+    topTechnicalProjects.forEach((item, index) => {
+      specialMentions.push({
+        type: 'Giuria Tecnica',
+        position: index + 1,
+        project: item.project,
+        score: parseFloat(item.score.toFixed(1)),
+        description: 'progetto con la media più alta sui tre criteri dai soli giurati della giuria tecnica'
+      });
     });
   }
 
-  // 2. menzione speciale insieme per (rappresenta_associazione = true)
+  // 2. menzione speciale insieme per (rappresenta_associazione = true) - top 5
   const insiemePerProjects = (projects || []).map(project => ({
     project,
     score: calculateProjectAverage(project.id, vote => vote.rappresenta_associazione)
   })).filter(p => p.score > 0);
 
   if (insiemePerProjects.length > 0) {
-    const topInsieme = insiemePerProjects
-      .sort((a, b) => b.score - a.score)[0];
+    const topInsiemeProjects = insiemePerProjects
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5);
     
-    specialMentions.push({
-      type: 'Insieme Per',
-      project: topInsieme.project,
-      score: parseFloat(topInsieme.score.toFixed(1)),
-      description: 'progetto con la media più alta sui tre criteri dai soli giurati appartenenti a insieme per'
+    topInsiemeProjects.forEach((item, index) => {
+      specialMentions.push({
+        type: 'Insieme Per',
+        position: index + 1,
+        project: item.project,
+        score: parseFloat(item.score.toFixed(1)),
+        description: 'progetto con la media più alta sui tre criteri dai soli giurati appartenenti a insieme per'
+      });
     });
   }
 
@@ -215,14 +223,18 @@ export default async function ResultsPage() {
   }).filter(p => p.score > 0);
 
   if (socialImpactProjects.length > 0) {
-    const topSocialImpact = socialImpactProjects
-      .sort((a, b) => b.score - a.score)[0];
+    const topSocialImpactProjects = socialImpactProjects
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5);
     
-    specialMentions.push({
-      type: 'Impatto Sociale',
-      project: topSocialImpact.project,
-      score: parseFloat(topSocialImpact.score.toFixed(1)),
-      description: 'progetto con il punteggio più alto nel criterio "impatto sociale"'
+    topSocialImpactProjects.forEach((item, index) => {
+      specialMentions.push({
+        type: 'Impatto Sociale',
+        position: index + 1,
+        project: item.project,
+        score: parseFloat(item.score.toFixed(1)),
+        description: 'progetto con il punteggio più alto nel criterio "impatto sociale"'
+      });
     });
   }
 
@@ -289,7 +301,7 @@ export default async function ResultsPage() {
                     winner.position === 1 ? 'bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800' :
                     winner.position === 2 ? 'bg-gray-100 dark:bg-gray-800/30 border border-gray-200 dark:border-gray-700' :
                     winner.position === 3 ? 'bg-orange-100 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800' :
-                    'bg-muted/50'
+                    'bg-muted/30 border border-muted'
                   }`}>
                     <div className="flex items-start gap-4">
                       <Badge 
@@ -298,7 +310,7 @@ export default async function ResultsPage() {
                           winner.position === 1 ? 'bg-yellow-500 text-white hover:bg-yellow-600' :
                           winner.position === 2 ? 'bg-gray-500 text-white hover:bg-gray-600' :
                           winner.position === 3 ? 'bg-orange-500 text-white hover:bg-orange-600' :
-                          ''
+                          'bg-muted text-muted-foreground hover:bg-muted/80'
                         }`}
                       >
                         {winner.position}°
@@ -340,48 +352,77 @@ export default async function ResultsPage() {
 
       {/* menzioni speciali */}
       {specialMentions.length > 0 && (
-        <div className="space-y-6">
+        <div className="space-y-8">
           <div className="flex items-center gap-3 mb-6">
             <StarIcon size={28} className="text-[#04516f]" />
             <h2 className="text-2xl font-bold">Menzioni speciali</h2>
           </div>
 
-          {specialMentions.map((mention, index) => (
-            <Card key={index} className="p-4 sm:p-6 border-l-4 border-l-[#ffea1d]">
-              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <AwardIcon size={20} className="text-[#04516f]" />
-                    <h3 className="text-lg font-bold text-[#04516f]">
-                      menzione speciale {mention.type.toLowerCase()}
-                    </h3>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    {mention.description}
-                  </p>
-                  <Link 
-                    href={`/protected/admin/project/${mention.project.id}`}
-                    className="text-xl font-semibold text-[#04516f] hover:text-[#033d5a] dark:text-[#6ba3c7] dark:hover:text-[#8bb8d4] underline hover:no-underline transition-colors"
-                  >
-                    {mention.project.name}
-                  </Link>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    {truncateText(
-                      mention.project.jury_info || 
-                      mention.project.objectives_results || 
-                      'nessuna descrizione disponibile',
-                      150
-                    )}
-                  </p>
+          {/* group special mentions by type */}
+          {['Giuria Tecnica', 'Insieme Per', 'Impatto Sociale'].map(mentionType => {
+            const typeMentions = specialMentions.filter(m => m.type === mentionType);
+            if (typeMentions.length === 0) return null;
+
+            return (
+              <Card key={mentionType} className="p-4 sm:p-6 border-l-4 border-l-[#ffea1d]">
+                <div className="flex items-center gap-3 mb-4">
+                  <AwardIcon size={20} className="text-[#04516f]" />
+                  <h3 className="text-xl font-bold text-[#04516f]">
+                    menzione speciale {mentionType.toLowerCase()}
+                  </h3>
                 </div>
-                <div className="mt-4 sm:mt-0 sm:text-right sm:ml-4">
-                  <div className="text-xl font-bold">
-                    {mention.score} <span className="text-sm text-muted-foreground">/ 5</span>
-                  </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  {typeMentions[0].description}
+                </p>
+                
+                <div className="space-y-3">
+                  {typeMentions.map((mention) => (
+                    <div key={`${mention.type}-${mention.position}`} className={`flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 rounded-lg ${
+                      mention.position === 1 ? 'bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800' :
+                      mention.position === 2 ? 'bg-gray-100 dark:bg-gray-800/30 border border-gray-200 dark:border-gray-700' :
+                      mention.position === 3 ? 'bg-orange-100 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800' :
+                      'bg-muted/30 border border-muted'
+                    }`}>
+                      <div className="flex items-start gap-3">
+                        <Badge 
+                          variant="secondary" 
+                          className={`text-sm px-2 py-1 font-bold mt-1 ${
+                            mention.position === 1 ? 'bg-yellow-500 text-white hover:bg-yellow-600' :
+                            mention.position === 2 ? 'bg-gray-500 text-white hover:bg-gray-600' :
+                            mention.position === 3 ? 'bg-orange-500 text-white hover:bg-orange-600' :
+                            'bg-muted text-muted-foreground hover:bg-muted/80'
+                          }`}
+                        >
+                          {mention.position}°
+                        </Badge>
+                        <div className="flex-1">
+                          <Link 
+                            href={`/protected/admin/project/${mention.project.id}`}
+                            className="text-lg font-semibold text-[#04516f] hover:text-[#033d5a] dark:text-[#6ba3c7] dark:hover:text-[#8bb8d4] underline hover:no-underline transition-colors"
+                          >
+                            {mention.project.name}
+                          </Link>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {truncateText(
+                              mention.project.jury_info || 
+                              mention.project.objectives_results || 
+                              'nessuna descrizione disponibile',
+                              100
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="mt-3 sm:mt-0 sm:text-right">
+                        <div className="text-lg font-bold">
+                          {mention.score} <span className="text-sm text-muted-foreground">/ 5</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
         </div>
       )}
 

@@ -49,6 +49,7 @@ export interface CategoryWinner {
 
 export interface SpecialMention {
   type: 'Giuria Tecnica' | 'Insieme Per' | 'Impatto Sociale';
+  position: number;
   project: Project;
   score: number;
   description: string;

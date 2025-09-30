@@ -241,6 +241,7 @@ export const exportResultsData = (
     'progetto',
     'organizzazione',
     'punteggio medio',
+    'podio',
     'descrizione'
   ]);
 
@@ -252,6 +253,7 @@ export const exportResultsData = (
         winner.project.name,
         winner.project.organization_name || '',
         winner.averageScore,
+        winner.position <= 3 ? 'sì' : 'no',
         winner.project.jury_info || winner.project.objectives_results || ''
       ]);
     });
@@ -264,6 +266,7 @@ export const exportResultsData = (
     { wch: 30 }, // progetto
     { wch: 25 }, // organizzazione
     { wch: 15 }, // punteggio medio
+    { wch: 10 }, // podio
     { wch: 50 }  // descrizione
   ];
   XLSX.utils.book_append_sheet(workbook, winnersWorksheet, 'vincitori per categoria');
@@ -272,9 +275,11 @@ export const exportResultsData = (
   const mentionsData: (string | number)[][] = [];
   mentionsData.push([
     'tipo menzione',
+    'posizione',
     'progetto',
     'organizzazione',
     'punteggio',
+    'podio',
     'descrizione menzione',
     'descrizione progetto'
   ]);
@@ -282,9 +287,11 @@ export const exportResultsData = (
   specialMentions.forEach(mention => {
     mentionsData.push([
       mention.type.toLowerCase(),
+      `${mention.position}°`,
       mention.project.name,
       mention.project.organization_name || '',
       mention.score,
+      mention.position <= 3 ? 'sì' : 'no',
       mention.description,
       mention.project.jury_info || mention.project.objectives_results || ''
     ]);
@@ -293,36 +300,120 @@ export const exportResultsData = (
   const mentionsWorksheet = XLSX.utils.aoa_to_sheet(mentionsData);
   mentionsWorksheet['!cols'] = [
     { wch: 20 }, // tipo menzione
+    { wch: 10 }, // posizione
     { wch: 30 }, // progetto
     { wch: 25 }, // organizzazione
     { wch: 12 }, // punteggio
+    { wch: 10 }, // podio
     { wch: 50 }, // descrizione menzione
     { wch: 50 }  // descrizione progetto
   ];
   XLSX.utils.book_append_sheet(workbook, mentionsWorksheet, 'menzioni speciali');
 
-  // create summary worksheet
-  const summaryData: (string | number)[][] = [];
-  summaryData.push(['statistiche generali', '']);
-  summaryData.push(['giurati votanti', uniqueVoterCount]);
-  summaryData.push(['voti totali', totalVotes]);
-  summaryData.push(['', '']);
-  summaryData.push(['categorie', 'progetti vincitori']);
+  const timestamp = new Date().toISOString().split('T')[0];
+  downloadExcel(workbook, `pea_awards_risultati_${timestamp}`);
+};
+
+// export projects summary with category and average vote
+export const exportProjectsSummary = (
+  votes: VoteWithEmailAndWeight[],
+  jurors: Juror[],
+  projects: Project[],
+  criteria: Criterion[]
+) => {
+  const workbook = XLSX.utils.book_new();
   
-  Object.entries(categoryWinners).forEach(([category, winners]) => {
-    summaryData.push([category.toLowerCase(), winners.length]);
+  // create vote matrix: user -> project -> criteria -> score
+  const voteMatrix = new Map<string, Map<number, Map<number, number>>>();
+  votes.forEach(vote => {
+    const userId = vote.user_id;
+    const projectId = vote.project_id;
+    const criteriaId = vote.criteria_id;
+    
+    if (!voteMatrix.has(userId)) {
+      voteMatrix.set(userId, new Map());
+    }
+    if (!voteMatrix.get(userId)!.has(projectId)) {
+      voteMatrix.get(userId)!.set(projectId, new Map());
+    }
+    voteMatrix.get(userId)!.get(projectId)!.set(criteriaId, vote.score);
   });
 
-  summaryData.push(['', '']);
-  summaryData.push(['menzioni speciali', specialMentions.length]);
+  // helper function to get project average across all jurors
+  const getProjectAverage = (projectId: number): number => {
+    const allScores: number[] = [];
+    jurors.forEach(juror => {
+      const userVotes = voteMatrix.get(juror.user_id);
+      if (userVotes && userVotes.has(projectId)) {
+        const projectVotes = userVotes.get(projectId)!;
+        const scores = Array.from(projectVotes.values());
+        if (scores.length > 0) {
+          const average = scores.reduce((sum, score) => sum + score, 0) / scores.length;
+          allScores.push(average);
+        }
+      }
+    });
+    
+    if (allScores.length === 0) return 0;
+    const average = allScores.reduce((sum, score) => sum + score, 0) / allScores.length;
+    return parseFloat(average.toFixed(2));
+  };
+
+  // create projects summary data
+  const summaryData: (string | number)[][] = [];
+  summaryData.push([
+    'progetto',
+    'organizzazione',
+    'categoria',
+    'punteggio medio',
+    'numero giurati votanti',
+    'descrizione progetto'
+  ]);
+
+  // sort projects by category, then by average score (descending)
+  const sortedProjects = [...projects].sort((a, b) => {
+    const categoryA = a.project_category || 'senza categoria';
+    const categoryB = b.project_category || 'senza categoria';
+    
+    if (categoryA !== categoryB) {
+      return categoryA.localeCompare(categoryB);
+    }
+    
+    const avgA = getProjectAverage(a.id);
+    const avgB = getProjectAverage(b.id);
+    return avgB - avgA; // descending order
+  });
+
+  sortedProjects.forEach(project => {
+    const averageScore = getProjectAverage(project.id);
+    
+    // count how many jurors voted for this project
+    const votingJurors = jurors.filter(juror => {
+      const userVotes = voteMatrix.get(juror.user_id);
+      return userVotes && userVotes.has(project.id);
+    }).length;
+
+    summaryData.push([
+      project.name,
+      project.organization_name || '',
+      project.project_category || 'senza categoria',
+      averageScore > 0 ? averageScore : '-',
+      votingJurors,
+      project.jury_info || project.objectives_results || ''
+    ]);
+  });
 
   const summaryWorksheet = XLSX.utils.aoa_to_sheet(summaryData);
   summaryWorksheet['!cols'] = [
-    { wch: 25 }, // label
-    { wch: 15 }  // value
+    { wch: 35 }, // progetto
+    { wch: 30 }, // organizzazione
+    { wch: 25 }, // categoria
+    { wch: 15 }, // punteggio medio
+    { wch: 20 }, // numero giurati votanti
+    { wch: 50 }  // descrizione progetto
   ];
-  XLSX.utils.book_append_sheet(workbook, summaryWorksheet, 'riepilogo');
+  XLSX.utils.book_append_sheet(workbook, summaryWorksheet, 'riepilogo progetti');
 
   const timestamp = new Date().toISOString().split('T')[0];
-  downloadExcel(workbook, `pea_awards_risultati_${timestamp}`);
+  downloadExcel(workbook, `pea_awards_progetti_riepilogo_${timestamp}`);
 };

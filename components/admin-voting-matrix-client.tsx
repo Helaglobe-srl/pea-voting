@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { VotingMatrixLoading } from "./admin-loading-skeleton";
-import { exportAdminVotingMatrix } from "@/lib/excel-export";
+import { exportAdminVotingMatrix, exportProjectsSummary } from "@/lib/excel-export";
 import { FileSpreadsheetIcon } from "lucide-react";
 import type { VoteWithEmailAndWeight, Juror, Project, Criterion } from "@/lib/types";
 
@@ -96,6 +96,11 @@ export function AdminVotingMatrixClient({ initialData }: AdminVotingMatrixClient
     exportAdminVotingMatrix(votes, jurors, projects, criteria);
   };
 
+  // handle projects summary export
+  const handleExportProjectsSummary = () => {
+    exportProjectsSummary(votes, jurors, projects, criteria);
+  };
+
   // get individual criteria scores for a user-project combination
   const getIndividualScores = (userId: string, projectId: number): { [criteriaId: number]: number } | null => {
     const userVotes = voteMatrix.get(userId);
@@ -139,13 +144,21 @@ export function AdminVotingMatrixClient({ initialData }: AdminVotingMatrixClient
 
   return (
     <>
-      {/* export button */}
+      {/* export buttons */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">📊 Matrice di votazione</h2>
-        <Button onClick={handleExportToExcel} variant="outline" className="flex items-center gap-2">
-          <FileSpreadsheetIcon size={16} />
-          Esporta Excel
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={handleExportProjectsSummary} variant="outline" className="flex items-center gap-2">
+            <FileSpreadsheetIcon size={16} />
+            <span className="hidden sm:inline">Statistiche progetti</span>
+            <span className="sm:hidden">statistiche p.</span>
+          </Button>
+          <Button onClick={handleExportToExcel} variant="outline" className="flex items-center gap-2">
+            <FileSpreadsheetIcon size={16} />
+            <span className="hidden sm:inline">Statistiche votanti</span>
+            <span className="sm:hidden">statistiche v.</span>
+          </Button>
+        </div>
       </div>
 
       {/* voting matrix tables by category */}
