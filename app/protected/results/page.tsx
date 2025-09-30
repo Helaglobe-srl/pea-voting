@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChartBarIcon, ArrowLeftIcon, TrophyIcon, AwardIcon, StarIcon } from "lucide-react";
-import { ResultsExportButton } from "@/components/results-export-button";
+import { ResultsExportButton } from "@/components/results-export-button"; // updated component
 import { fetchAllRpcResults } from "@/lib/supabase-utils";
 import type { VoteWithEmailAndWeight, CategoryWinner, SpecialMention } from "@/lib/types";
 
@@ -249,11 +249,9 @@ export default async function ResultsPage() {
           <h1 className="text-2xl sm:text-3xl font-bold">vincitori pea awards 2025</h1>
         </div>
         <div className="flex flex-col xs:flex-row gap-2 w-full sm:w-auto">
-          <ResultsExportButton 
+          <ResultsExportButton
             categoryWinners={categoryWinners}
             specialMentions={specialMentions}
-            uniqueVoterCount={uniqueVoterCount}
-            totalVotes={normalUserVotes.length}
           />
           <Button asChild variant="outline" className="flex-1 xs:flex-none">
             <Link href="/protected/admin" className="flex items-center justify-center gap-2">
