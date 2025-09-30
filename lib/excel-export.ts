@@ -227,9 +227,7 @@ export const exportAdminVotingMatrix = (
 // export results page data
 export const exportResultsData = (
   categoryWinners: { [category: string]: CategoryWinner[] },
-  specialMentions: SpecialMention[],
-  uniqueVoterCount: number,
-  totalVotes: number
+  specialMentions: SpecialMention[]
 ) => {
   const workbook = XLSX.utils.book_new();
 
@@ -318,8 +316,7 @@ export const exportResultsData = (
 export const exportProjectsSummary = (
   votes: VoteWithEmailAndWeight[],
   jurors: Juror[],
-  projects: Project[],
-  criteria: Criterion[]
+  projects: Project[]
 ) => {
   const workbook = XLSX.utils.book_new();
   
