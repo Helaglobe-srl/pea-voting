@@ -1,19 +1,20 @@
 "use client";
 
-import { useState } from "react";
+// import { useState } from "react"; // temporarily disabled for feedback
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { CheckCircle2, Loader2 } from "lucide-react";
+// import { Label } from "@/components/ui/label"; // temporarily disabled for feedback
+// import { Alert, AlertDescription } from "@/components/ui/alert"; // temporarily disabled for feedback
+import { CheckCircle2 } from "lucide-react"; // Loader2 temporarily disabled for feedback
 import Image from "next/image";
 
 export default function SuccessPage() {
   const router = useRouter();
   
-  const [gradimento, setGradimento] = useState(5);
+  // feedback functionality temporarily disabled
+  /* const [gradimento, setGradimento] = useState(5);
   const [adozione, setAdozione] = useState("Sì");
   const [suggerimenti, setSuggerimenti] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -66,7 +67,7 @@ export default function SuccessPage() {
     } finally {
       setSubmitting(false);
     }
-  };
+  }; */
 
   const handleNewRegistration = () => {
     router.push("/iscrizioni");
