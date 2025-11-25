@@ -96,6 +96,8 @@ export async function POST(request: NextRequest) {
   } catch (error: unknown) {
     console.error('errore durante il salvataggio del feedback:', error);
     const errorMessage = error instanceof Error ? error.message : 'errore sconosciuto';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    console.error('stack trace:', errorStack);
     return NextResponse.json(
       { 
         error: 'errore durante il salvataggio del feedback',

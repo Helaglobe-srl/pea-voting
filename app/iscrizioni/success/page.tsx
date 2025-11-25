@@ -129,7 +129,8 @@ export default function SuccessPage() {
           </CardContent>
         </Card>
 
-        {!feedbackSent ? (
+        {/* feedback section - temporarily commented out */}
+        {/* {!feedbackSent ? (
           <Card className="border-2 shadow-lg">
             <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950 dark:to-pink-950">
               <CardTitle className="text-2xl">💭 Il tuo feedback è importante per noi!</CardTitle>
@@ -220,7 +221,7 @@ export default function SuccessPage() {
               ✨ Grazie per il tuo feedback!
             </AlertDescription>
           </Alert>
-        )}
+        )} */}
 
         <div className="flex justify-center pt-4">
           <Button 
