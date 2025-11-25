@@ -246,7 +246,7 @@ export default async function ResultsPage() {
     <div className="flex-1 w-full flex flex-col gap-8">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold">vincitori pea awards 2025</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">vincitori pea awards 2026</h1>
         </div>
         <div className="flex flex-col xs:flex-row gap-2 w-full sm:w-auto">
           <ResultsExportButton

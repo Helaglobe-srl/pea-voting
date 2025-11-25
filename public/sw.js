@@ -1,5 +1,5 @@
 // minimal service worker for pwa installation
-const CACHE_NAME = 'pea-voting-v1';
+const CACHE_NAME = 'pea-voting-v2';
 
 self.addEventListener('install', function(event) {
   console.log('Service Worker installing');
