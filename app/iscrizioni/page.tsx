@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -149,7 +149,9 @@ export default function IscrizioniPage() {
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const content = await page.getTextContent();
-        const pageText = content.items.map((item: any) => item.str).join(' ');
+        const pageText = content.items
+          .map((item) => ('str' in item ? item.str : ''))
+          .join(' ');
         textContent += pageText + '\n';
       }
       
@@ -516,7 +518,7 @@ export default function IscrizioniPage() {
 
           {areeTerapeutiche.includes("Altro") && (
             <div>
-              <Label htmlFor="area-custom">Specifica l'Area Terapeutica *</Label>
+              <Label htmlFor="area-custom">Specifica l&apos;Area Terapeutica *</Label>
               <Input
                 id="area-custom"
                 value={areaTerapeuticaCustom}
@@ -524,7 +526,7 @@ export default function IscrizioniPage() {
               />
               {areaTerapeuticaCustom && !validateText(areaTerapeuticaCustom) && (
                 <p className="text-sm text-red-600 mt-1">
-                  l'area terapeutica contiene caratteri non consentiti: {getInvalidChars(areaTerapeuticaCustom)}
+                  l&apos;area terapeutica contiene caratteri non consentiti: {getInvalidChars(areaTerapeuticaCustom)}
                 </p>
               )}
             </div>
@@ -783,7 +785,7 @@ export default function IscrizioniPage() {
                 <br />
                 <br />
                 Ogni campo riprende i contenuti riportati nella presentazione, ma puoi modificare se necessario e, una
-                volta che avrai verificato che tutto sia corretto, premi il pulsante <strong>'Sottometti Iscrizione'</strong> per
+                volta che avrai verificato che tutto sia corretto, premi il pulsante <strong>&apos;Sottometti Iscrizione&apos;</strong> per
                 completare la procedura.
                 <br />
                 <br />
@@ -808,7 +810,7 @@ export default function IscrizioniPage() {
               </div>
 
               <div>
-                <Label htmlFor="sintesi-ebook">Sintesi informazioni per l'Ebook (max 5 frasi)</Label>
+                <Label htmlFor="sintesi-ebook">Sintesi informazioni per l&apos;Ebook (max 5 frasi)</Label>
                 <textarea
                   id="sintesi-ebook"
                   value={sintesiEbook}
@@ -865,9 +867,9 @@ export default function IscrizioniPage() {
                     className={fieldErrors.ai_consent ? "border-red-500" : ""}
                   />
                   <label htmlFor="ai-consent" className="text-sm">
-                    Acconsento all'utilizzo di tecnologie di Intelligenza Artificiale per l'analisi della presentazione,
+                    Acconsento all&apos;utilizzo di tecnologie di Intelligenza Artificiale per l&apos;analisi della presentazione,
                     esclusivamente allo scopo di velocizzare il processo di iscrizione. I contenuti non verranno in alcun
-                    modo utilizzati per l'addestramento di modelli e saranno trattati nel rispetto del GDPR 2016/679 e
+                    modo utilizzati per l&apos;addestramento di modelli e saranno trattati nel rispetto del GDPR 2016/679 e
                     della normativa vigente in materia di protezione dei dati personali *
                   </label>
                 </div>

@@ -1,13 +1,11 @@
 import { EnvVarWarning } from "@/components/env-var-warning";
 import { AuthButton } from "@/components/auth-button";
-import { Hero } from "@/components/hero";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { NavLinks } from "@/components/nav-links";
 import { hasEnvVars } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
 
 export default async function Home() {
   // check authentication status
@@ -99,7 +97,7 @@ export default async function Home() {
                     </div>
                     <h3 className="text-2xl font-bold">Votazione Giuria</h3>
                     <p className="text-muted-foreground">
-                      Accedi all'area riservata per votare i progetti candidati. Solo per membri della giuria.
+                      Accedi all&apos;area riservata per votare i progetti candidati. Solo per membri della giuria.
                     </p>
                     <div className="mt-4 px-6 py-2 bg-green-600 text-white rounded-full font-semibold group-hover:bg-green-700 transition-colors">
                       Vai alla Votazione →
@@ -137,7 +135,7 @@ export default async function Home() {
                   </div>
                   <h3 className="text-2xl font-bold">Votazione Giuria</h3>
                   <p className="text-muted-foreground">
-                    Accedi all'area riservata per votare i progetti candidati. Solo per membri della giuria.
+                    Accedi all&apos;area riservata per votare i progetti candidati. Solo per membri della giuria.
                   </p>
                   <Link href="/auth/login" className="mt-4 px-6 py-2 bg-gray-600 text-white rounded-full font-semibold hover:bg-gray-700 transition-colors">
                     Accedi per Votare

@@ -113,8 +113,8 @@ export default function SuccessPage() {
             <p className="font-semibold text-lg">Grazie per aver candidato il tuo progetto!</p>
             
             <div className="space-y-3">
-              <p>✅ Riceverai un'e-mail di conferma con il riepilogo dei dati inseriti.</p>
-              <p>📬 Controlla la tua casella di posta per tutti i dettagli. Se non ricevi l'email, controlla anche la cartella spam.</p>
+              <p>✅ Riceverai un&apos;e-mail di conferma con il riepilogo dei dati inseriti.</p>
+              <p>📬 Controlla la tua casella di posta per tutti i dettagli. Se non ricevi l&apos;email, controlla anche la cartella spam.</p>
               <p className="pt-4 border-t">
                 <strong>Per eventuali necessità:</strong><br/>
                 📧 Email: <a href="mailto:peaward@helaglobe.com" className="text-blue-600 hover:underline">peaward@helaglobe.com</a><br/>
