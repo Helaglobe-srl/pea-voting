@@ -13,6 +13,11 @@ export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
   title: "Piattaforma di Votazione - Patient Engagement Award",
   description: "Vota per le iniziative di engagement del paziente",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
