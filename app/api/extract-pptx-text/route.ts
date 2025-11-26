@@ -27,7 +27,7 @@ async function extractTextFromPPTX(buffer: Buffer): Promise<string> {
       const result = await parseStringPromise(slideXml);
       
       // extract all text nodes recursively
-      const extractTextRecursive = (obj: any): string => {
+      const extractTextRecursive = (obj: unknown): string => {
         let text = '';
         if (typeof obj === 'string') {
           return obj;
@@ -37,14 +37,15 @@ async function extractTextFromPPTX(buffer: Buffer): Promise<string> {
             text += extractTextRecursive(item) + ' ';
           }
         } else if (typeof obj === 'object' && obj !== null) {
+          const objRecord = obj as Record<string, unknown>;
           // look for text in 'a:t' nodes (text nodes in powerpoint xml)
-          if (obj['a:t']) {
-            text += extractTextRecursive(obj['a:t']) + ' ';
+          if (objRecord['a:t']) {
+            text += extractTextRecursive(objRecord['a:t']) + ' ';
           }
           // recursively search all properties
-          for (const key in obj) {
+          for (const key in objRecord) {
             if (key !== 'a:t') {
-              text += extractTextRecursive(obj[key]);
+              text += extractTextRecursive(objRecord[key]);
             }
           }
         }
@@ -66,7 +67,7 @@ async function extractTextFromPPTX(buffer: Buffer): Promise<string> {
       const notesXml = await zip.files[notesFile].async('text');
       const result = await parseStringPromise(notesXml);
       
-      const extractTextRecursive = (obj: any): string => {
+      const extractTextRecursive = (obj: unknown): string => {
         let text = '';
         if (typeof obj === 'string') {
           return obj;
@@ -76,12 +77,13 @@ async function extractTextFromPPTX(buffer: Buffer): Promise<string> {
             text += extractTextRecursive(item) + ' ';
           }
         } else if (typeof obj === 'object' && obj !== null) {
-          if (obj['a:t']) {
-            text += extractTextRecursive(obj['a:t']) + ' ';
+          const objRecord = obj as Record<string, unknown>;
+          if (objRecord['a:t']) {
+            text += extractTextRecursive(objRecord['a:t']) + ' ';
           }
-          for (const key in obj) {
+          for (const key in objRecord) {
             if (key !== 'a:t') {
-              text += extractTextRecursive(obj[key]);
+              text += extractTextRecursive(objRecord[key]);
             }
           }
         }
@@ -131,7 +133,7 @@ export async function POST(request: NextRequest) {
     if (fileName.endsWith('.pptx')) {
       try {
         textContent = await extractTextFromPPTX(buffer);
-      } catch (error) {
+      } catch {
         // fallback to officeparser on error
       }
     }

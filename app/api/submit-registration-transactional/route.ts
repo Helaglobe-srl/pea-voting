@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
+import { drive_v3 } from 'googleapis';
 import { Readable } from 'stream';
 import { cleanText } from '@/lib/validators';
 
@@ -54,7 +55,7 @@ async function createDriveClient() {
 
 // helper function to upload a file to google drive
 async function uploadFileToDrive(
-  drive: any,
+  drive: drive_v3.Drive,
   file: { buffer: Buffer; mimeType: string },
   fileName: string,
   folderId: string
@@ -84,7 +85,7 @@ async function uploadFileToDrive(
 }
 
 // helper function to delete a file from google drive
-async function deleteFileFromDrive(drive: any, fileId: string): Promise<void> {
+async function deleteFileFromDrive(drive: drive_v3.Drive, fileId: string): Promise<void> {
   try {
     await drive.files.delete({ fileId });
   } catch (error) {
@@ -95,7 +96,7 @@ async function deleteFileFromDrive(drive: any, fileId: string): Promise<void> {
 
 export async function POST(request: NextRequest) {
   const uploadedFileIds: string[] = [];
-  let drive: any = null;
+  let drive: drive_v3.Drive | null = null;
 
   try {
     const body = await request.json();
@@ -241,7 +242,7 @@ export async function POST(request: NextRequest) {
 }
 
 // helper function to rollback all uploaded files
-async function rollbackFiles(drive: any, fileIds: string[]): Promise<void> {
+async function rollbackFiles(drive: drive_v3.Drive, fileIds: string[]): Promise<void> {
   console.log(`rollback: eliminazione di ${fileIds.length} file da google drive...`);
   
   const deletePromises = fileIds.map(fileId => deleteFileFromDrive(drive, fileId));
