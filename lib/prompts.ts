@@ -10,7 +10,7 @@ export const ANALYZE_PRESENTATION_PROMPT = `Analizza questa presentazione PowerP
 
 4. OBIETTIVI: [elenca al massimo 3 obiettivi principali del progetto in modo conciso. Metti ogni obiettivo su una nuova riga, iniziando con - e andando a capo dopo ogni obiettivo]
 
-5. RISULTATI: [elenca tutti i principali risultati raggiunti in modo conciso. Metti ogni risultato su una nuova riga, iniziando con - e andando a capo dopo ogni risultato]
+5. RISULTATI: [elenca al massimo 4 risultati più importanti dal punto di vista del patient engagement e del ROI (ritorno sull'investimento). Metti ogni risultato su una nuova riga, iniziando con - e andando a capo dopo ogni risultato]
 
 Usa esattamente questi delimitatori nella tua risposta:
 <CATEGORIA>categoria</CATEGORIA>
@@ -34,7 +34,8 @@ IMPORTANTE:
 - Non usare MAI <br> per andare a capo
 - Usa un vero ritorno a capo dopo ogni elemento con -
 - Elenca MASSIMO 3 obiettivi (i più importanti)
-- Elenca TUTTI i risultati trovati
+- Elenca MASSIMO 4 risultati (i più importanti dal punto di vista del patient engagement e del ROI)
+- Prioritizza risultati quantificabili e misurabili che dimostrano l'impatto sui pazienti
 
 Contenuto della presentazione:
 {textContent}`;
