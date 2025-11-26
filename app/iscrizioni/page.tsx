@@ -22,12 +22,6 @@ interface ExtractedContent {
   risultati: string;
 }
 
-interface FileUploadIds {
-  marchio?: string;
-  image?: string;
-  presentation?: string;
-}
-
 export default function IscrizioniPage() {
   const router = useRouter();
   
@@ -64,9 +58,7 @@ export default function IscrizioniPage() {
   const [juryConsent, setJuryConsent] = useState(false);
   const [marketingConsent, setMarketingConsent] = useState(false);
 
-  // upload state
-  const [filesUploadedToDrive, setFilesUploadedToDrive] = useState(false);
-  const [fileUploadIds, setFileUploadIds] = useState<FileUploadIds>({});
+  // upload state - removed: now using transactional api
 
   // ui state
   const [loading, setLoading] = useState(false);
@@ -182,30 +174,6 @@ export default function IscrizioniPage() {
     return "";
   };
 
-  const uploadFileToDrive = async (file: File, fileName: string): Promise<string> => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("fileName", fileName);
-    formData.append("folderId", process.env.NEXT_PUBLIC_DRIVE_FOLDER_ID || "");
-
-    const response = await fetch("/api/upload-to-drive", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`errore durante il caricamento del file ${fileName}: ${errorData.error || response.statusText}`);
-    }
-
-    const data = await response.json();
-    
-    if (!data.fileId) {
-      throw new Error(`file id mancante per ${fileName}`);
-    }
-    
-    return data.fileId;
-  };
 
   const handleSubmit = async () => {
     // reset errori
@@ -256,36 +224,7 @@ export default function IscrizioniPage() {
     setSubmitting(true);
 
     try {
-      // 1. carica i file su google drive
-      let uploadedFileIds = fileUploadIds;
-      
-      if (!filesUploadedToDrive) {
-        const cleanName = (s: string) => s.toLowerCase().replace(/\s/g, "_");
-        const baseFilename = `${cleanName(ragioneSociale)}_${cleanName(titoloProgetto)}`;
-
-        const fileIds: FileUploadIds = {};
-
-        if (marchioFile) {
-          const ext = marchioFile.name.split('.').pop();
-          fileIds.marchio = await uploadFileToDrive(marchioFile, `${baseFilename}_marchio.${ext}`);
-        }
-
-        if (imageFile) {
-          const ext = imageFile.name.split('.').pop();
-          fileIds.image = await uploadFileToDrive(imageFile, `${baseFilename}_immagine.${ext}`);
-        }
-
-        if (presentationFile) {
-          const ext = presentationFile.name.split('.').pop();
-          fileIds.presentation = await uploadFileToDrive(presentationFile, `${baseFilename}_presentazione.${ext}`);
-        }
-
-        uploadedFileIds = fileIds;
-        setFileUploadIds(fileIds);
-        setFilesUploadedToDrive(true);
-      }
-
-      // 2. prepara i dati del form
+      // prepara i dati del form
       const finalTipologia = tipologia === "Altro" && tipologiaCustom ? tipologiaCustom : tipologia;
       const finalAreeTerapeutiche = areeTerapeutiche
         .map((area) => (area === "Altro" && areaTerapeuticaCustom ? areaTerapeuticaCustom : area))
@@ -316,20 +255,62 @@ export default function IscrizioniPage() {
         risultati: risultati,
       };
 
-      // 3. invia i dati a n8n
-      const registrationResponse = await fetch("/api/submit-registration", {
+      // prepara i file per l'upload transazionale
+      const cleanName = (s: string) => s.toLowerCase().replace(/\s/g, "_");
+      const baseFilename = `${cleanName(ragioneSociale)}_${cleanName(titoloProgetto)}`;
+      
+      const files: { [key: string]: { buffer: string; mimeType: string; fileName: string } } = {};
+
+      // converti i file in base64 per l'invio
+      if (marchioFile) {
+        const ext = marchioFile.name.split('.').pop();
+        const buffer = await fileToBase64(marchioFile);
+        files.marchio = {
+          buffer,
+          mimeType: marchioFile.type,
+          fileName: `${baseFilename}_marchio.${ext}`
+        };
+      }
+
+      if (imageFile) {
+        const ext = imageFile.name.split('.').pop();
+        const buffer = await fileToBase64(imageFile);
+        files.image = {
+          buffer,
+          mimeType: imageFile.type,
+          fileName: `${baseFilename}_immagine.${ext}`
+        };
+      }
+
+      if (presentationFile) {
+        const ext = presentationFile.name.split('.').pop();
+        const buffer = await fileToBase64(presentationFile);
+        files.presentation = {
+          buffer,
+          mimeType: presentationFile.type,
+          fileName: `${baseFilename}_presentazione.${ext}`
+        };
+      }
+
+      // invia tutto in modo transazionale (upload + scrittura su google sheets)
+      // se qualcosa fallisce, viene fatto automaticamente il rollback
+      const registrationResponse = await fetch("/api/submit-registration-transactional", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ formData, summaryData, fileIds: uploadedFileIds }),
+        body: JSON.stringify({ formData, summaryData, files }),
       });
 
       if (!registrationResponse.ok) {
-        throw new Error(`errore durante la sottomissione della registrazione: ${registrationResponse.status}`);
+        const errorData = await registrationResponse.json();
+        throw new Error(errorData.details || errorData.error || `errore durante la sottomissione: ${registrationResponse.status}`);
       }
 
-      // 4. invia email di conferma
+      const registrationData = await registrationResponse.json();
+      const uploadedFileIds = registrationData.fileIds || {};
+
+      // invia email di conferma (questo è opzionale e non causa rollback se fallisce)
       try {
         const emailResponse = await fetch("/api/send-confirmation-email", {
           method: "POST",
@@ -351,10 +332,10 @@ export default function IscrizioniPage() {
         // non bloccare il processo se l'email fallisce
       }
 
-      // 5. salva i dati del form in session storage per la pagina di successo
+      // salva i dati del form in session storage per la pagina di successo
       sessionStorage.setItem('pea_form_data', JSON.stringify(formData));
       
-      // 6. redirect alla pagina di successo
+      // redirect alla pagina di successo
       router.push("/iscrizioni/success");
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "errore sconosciuto";
@@ -362,6 +343,19 @@ export default function IscrizioniPage() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  // helper function to convert file to base64
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsArrayBuffer(file);
+      reader.onload = () => {
+        const buffer = Buffer.from(reader.result as ArrayBuffer);
+        resolve(buffer.toString('base64'));
+      };
+      reader.onerror = (error) => reject(error);
+    });
   };
 
   return (
