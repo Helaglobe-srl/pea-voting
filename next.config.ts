@@ -22,6 +22,10 @@ const nextConfig: NextConfig = {
       },
     ]
   },
+  // increase body size limit for file uploads (default is 4mb)
+  experimental: {
+    // note: this is handled by vercel.json in production
+  },
 };
 
 export default nextConfig;

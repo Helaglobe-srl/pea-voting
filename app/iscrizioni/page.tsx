@@ -255,56 +255,69 @@ export default function IscrizioniPage() {
         risultati: risultati,
       };
 
-      // prepara i file per l'upload transazionale
+      // prepara i file per l'upload transazionale usando formdata
       const cleanName = (s: string) => s.toLowerCase().replace(/\s/g, "_");
       const baseFilename = `${cleanName(ragioneSociale)}_${cleanName(titoloProgetto)}`;
       
-      const files: { [key: string]: { buffer: string; mimeType: string; fileName: string } } = {};
-
-      // converti i file in base64 per l'invio
+      // crea formdata per inviare file e dati
+      const uploadFormData = new FormData();
+      
+      // aggiungi i dati json
+      uploadFormData.append('formData', JSON.stringify(formData));
+      uploadFormData.append('summaryData', JSON.stringify(summaryData));
+      
+      // aggiungi i file
+      let fileCount = 0;
       if (marchioFile) {
         const ext = marchioFile.name.split('.').pop();
-        const buffer = await fileToBase64(marchioFile);
-        files.marchio = {
-          buffer,
-          mimeType: marchioFile.type,
-          fileName: `${baseFilename}_marchio.${ext}`
-        };
+        const fileName = `${baseFilename}_marchio.${ext}`;
+        uploadFormData.append('marchio', marchioFile);
+        uploadFormData.append('marchio_fileName', fileName);
+        fileCount++;
       }
 
       if (imageFile) {
         const ext = imageFile.name.split('.').pop();
-        const buffer = await fileToBase64(imageFile);
-        files.image = {
-          buffer,
-          mimeType: imageFile.type,
-          fileName: `${baseFilename}_immagine.${ext}`
-        };
+        const fileName = `${baseFilename}_immagine.${ext}`;
+        uploadFormData.append('image', imageFile);
+        uploadFormData.append('image_fileName', fileName);
+        fileCount++;
       }
 
       if (presentationFile) {
         const ext = presentationFile.name.split('.').pop();
-        const buffer = await fileToBase64(presentationFile);
-        files.presentation = {
-          buffer,
-          mimeType: presentationFile.type,
-          fileName: `${baseFilename}_presentazione.${ext}`
-        };
+        const fileName = `${baseFilename}_presentazione.${ext}`;
+        uploadFormData.append('presentation', presentationFile);
+        uploadFormData.append('presentation_fileName', fileName);
+        fileCount++;
       }
 
       // invia tutto in modo transazionale (upload + scrittura su google sheets)
       // se qualcosa fallisce, viene fatto automaticamente il rollback
+      console.log('invio registrazione con', fileCount, 'file');
       const registrationResponse = await fetch("/api/submit-registration-transactional", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ formData, summaryData, files }),
+        body: uploadFormData, // no content-type header - browser sets it automatically with boundary
       });
+      console.log('risposta ricevuta:', registrationResponse.status);
 
       if (!registrationResponse.ok) {
-        const errorData = await registrationResponse.json();
-        throw new Error(errorData.details || errorData.error || `errore durante la sottomissione: ${registrationResponse.status}`);
+        let errorMessage = `errore durante la sottomissione: ${registrationResponse.status}`;
+        try {
+          const errorData = await registrationResponse.json();
+          errorMessage = errorData.details || errorData.error || errorMessage;
+        } catch {
+          // se non è json, prova a leggere come testo
+          try {
+            const errorText = await registrationResponse.text();
+            if (errorText) {
+              errorMessage = errorText.substring(0, 200); // limita la lunghezza
+            }
+          } catch {
+            // usa il messaggio di default
+          }
+        }
+        throw new Error(errorMessage);
       }
 
       const registrationData = await registrationResponse.json();
@@ -343,19 +356,6 @@ export default function IscrizioniPage() {
     } finally {
       setSubmitting(false);
     }
-  };
-
-  // helper function to convert file to base64
-  const fileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsArrayBuffer(file);
-      reader.onload = () => {
-        const buffer = Buffer.from(reader.result as ArrayBuffer);
-        resolve(buffer.toString('base64'));
-      };
-      reader.onerror = (error) => reject(error);
-    });
   };
 
   return (

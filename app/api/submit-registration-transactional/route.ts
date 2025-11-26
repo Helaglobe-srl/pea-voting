@@ -4,6 +4,10 @@ import { drive_v3 } from 'googleapis';
 import { Readable } from 'stream';
 import { cleanText } from '@/lib/validators';
 
+// configure route to handle large file uploads
+export const runtime = 'nodejs';
+export const maxDuration = 60; // 60 seconds timeout
+
 /**
  * transactional registration submission endpoint
  * 
@@ -99,8 +103,35 @@ export async function POST(request: NextRequest) {
   let drive: drive_v3.Drive | null = null;
 
   try {
-    const body = await request.json();
-    const { formData, summaryData, files } = body;
+    console.log('ricevuta richiesta di registrazione transazionale');
+    
+    // parse formdata instead of json to handle large files
+    const formDataRequest = await request.formData();
+    
+    // extract json data
+    const formDataJson = formDataRequest.get('formData') as string;
+    const summaryDataJson = formDataRequest.get('summaryData') as string;
+    
+    const formData = JSON.parse(formDataJson);
+    const summaryData = JSON.parse(summaryDataJson);
+    
+    // extract files
+    const files: { [key: string]: { file: File; fileName: string } } = {};
+    const fileKeys = ['marchio', 'image', 'presentation'];
+    
+    for (const key of fileKeys) {
+      const file = formDataRequest.get(key) as File | null;
+      const fileName = formDataRequest.get(`${key}_fileName`) as string | null;
+      if (file && fileName) {
+        files[key] = { file, fileName };
+      }
+    }
+    
+    console.log('dati ricevuti:', { 
+      hasFormData: !!formData, 
+      hasSummaryData: !!summaryData, 
+      filesCount: Object.keys(files).length 
+    });
 
     // validazione dei dati obbligatori
     if (!formData || !summaryData) {
@@ -120,25 +151,31 @@ export async function POST(request: NextRequest) {
     }
 
     // crea il client google drive
+    console.log('creazione client google drive...');
     drive = await createDriveClient();
+    console.log('client google drive creato');
 
     // step 1: carica tutti i file su google drive
     const fileIds: { [key: string]: string } = {};
 
     if (files && Object.keys(files).length > 0) {
+      console.log('inizio caricamento file...');
       for (const [key, fileData] of Object.entries(files)) {
-        const file = fileData as { buffer: string; mimeType: string; fileName: string };
+        const { file, fileName } = fileData;
         
-        // converti il buffer da base64 a buffer
-        const buffer = Buffer.from(file.buffer, 'base64');
+        // converti il file in buffer
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
         
         try {
+          console.log(`caricamento file ${key}: ${fileName}`);
           const fileId = await uploadFileToDrive(
             drive,
-            { buffer, mimeType: file.mimeType },
-            file.fileName,
+            { buffer, mimeType: file.type },
+            fileName,
             folderId
           );
+          console.log(`file ${key} caricato con id: ${fileId}`);
           
           fileIds[key] = fileId;
           uploadedFileIds.push(fileId);
@@ -187,6 +224,7 @@ export async function POST(request: NextRequest) {
     // step 3: invia i dati a n8n webhook (che scrive su google sheets)
     const webhookUrl = process.env.N8N_WEBHOOK_URL;
     if (!webhookUrl) {
+      console.error('webhook url mancante');
       // rollback: elimina i file caricati
       await rollbackFiles(drive, uploadedFileIds);
       return NextResponse.json(
@@ -195,6 +233,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log('invio dati a webhook n8n...');
     const webhookResponse = await fetch(webhookUrl, {
       method: 'POST',
       headers: {
@@ -216,6 +255,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log('webhook completato con successo');
     // tutto è andato a buon fine, restituisci i file ids per l'email di conferma
     return NextResponse.json({ 
       success: true,
