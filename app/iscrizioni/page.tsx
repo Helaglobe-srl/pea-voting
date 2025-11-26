@@ -140,7 +140,11 @@ export default function IscrizioniPage() {
       
       // use pdfjs-dist to extract text
       const pdfjsLib = await import('pdfjs-dist');
-      pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+      // use the worker from the local package instead of cdn to avoid fetch errors
+      pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+        'pdfjs-dist/build/pdf.worker.min.mjs',
+        import.meta.url
+      ).toString();
       
       const loadingTask = pdfjsLib.getDocument({ data: buffer });
       const pdf = await loadingTask.promise;
@@ -157,9 +161,22 @@ export default function IscrizioniPage() {
       
       return textContent;
     } else if (file.name.toLowerCase().endsWith('.pptx') || file.name.toLowerCase().endsWith('.ppt')) {
-      // for powerpoint, we'll need to send to server for processing
-      // for now, return a placeholder
-      return "presentazione powerpoint - l'estrazione del testo richiede elaborazione server-side";
+      // for powerpoint files, send to server for text extraction
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await fetch('/api/extract-pptx-text', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'errore durante l\'estrazione del testo dalla presentazione');
+      }
+      
+      const data = await response.json();
+      return data.textContent;
     }
     
     return "";
