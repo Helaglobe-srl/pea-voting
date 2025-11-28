@@ -3,6 +3,14 @@
     "app/api/submit-registration-transactional/route.ts": {
       "maxDuration": 60,
       "memory": 1024
+    },
+    "app/api/analyze-presentation/route.ts": {
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "app/api/extract-pptx-text/route.ts": {
+      "maxDuration": 60,
+      "memory": 1024
     }
   },
   "rewrites": [
@@ -12,4 +20,6 @@
     }
   ]
 }
+
+
 

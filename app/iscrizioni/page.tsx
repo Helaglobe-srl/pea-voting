@@ -106,7 +106,21 @@ export default function IscrizioniPage() {
       });
 
       if (!response.ok) {
-        throw new Error("errore durante l'analisi della presentazione");
+        // try to parse error response
+        let errorMessage = "errore durante l'analisi della presentazione";
+        try {
+          const errorData = await response.json();
+          if (errorData.error) {
+            errorMessage = errorData.error;
+            if (errorData.details) {
+              errorMessage += `: ${errorData.details}`;
+            }
+          }
+        } catch {
+          // if json parsing fails, use default message
+          errorMessage = `errore durante l'analisi della presentazione (status: ${response.status})`;
+        }
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
@@ -116,7 +130,13 @@ export default function IscrizioniPage() {
       setObiettivi(data.obiettivi);
       setRisultati(data.risultati);
       setAnalysisComplete(true);
-      setSuccess("✅ presentazione analizzata con successo!");
+      
+      // show success message with warning if content was truncated
+      if (data.wasTruncated) {
+        setSuccess("✅ presentazione analizzata con successo! ⚠️ nota: la presentazione era molto lunga, è stata analizzata una parte del contenuto.");
+      } else {
+        setSuccess("✅ presentazione analizzata con successo!");
+      }
     } catch (err) {
       setError(`errore durante l'analisi: ${err instanceof Error ? err.message : "errore sconosciuto"}`);
     } finally {
