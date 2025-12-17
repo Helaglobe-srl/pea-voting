@@ -43,7 +43,7 @@ export default async function VotePage({ params }: { params: Promise<{ id: strin
     .from("votes")
     .select("*")
     .eq("project_id", projectId)
-    .eq("user_id", sessionData.session.user.id);
+    .eq("user_id", user.id);
 
   if (votesError) {
     console.error("Error fetching votes:", votesError);
