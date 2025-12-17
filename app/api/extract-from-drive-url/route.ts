@@ -3,7 +3,6 @@ import officeParser from 'officeparser';
 import JSZip from 'jszip';
 import { parseStringPromise } from 'xml2js';
 import { google } from 'googleapis';
-import { Readable } from 'stream';
 import pdfParse from 'pdf-parse';
 
 // Extract Google Drive file ID from various URL formats
@@ -114,7 +113,7 @@ async function createDriveClient() {
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
   try {
-    const { driveUrl, projectId, registrationId, useCache = true } = await request.json();
+    const { driveUrl, projectId, useCache = true } = await request.json();
 
     if (!driveUrl) {
       return NextResponse.json({ error: 'Missing driveUrl' }, { status: 400 });
@@ -141,7 +140,7 @@ export async function POST(request: NextRequest) {
             cached: true
           });
         }
-      } catch (error) {
+      } catch {
         // Ignore cache errors (column might not exist yet)
         console.log('[Extract] Cache not available, proceeding with extraction');
       }
@@ -220,7 +219,7 @@ export async function POST(request: NextRequest) {
       try {
         extractedText = await officeParser.parseOfficeAsync(buffer);
         console.log(`[Extract] Generic parser extracted: ${extractedText.length} chars`);
-      } catch (error) {
+      } catch {
         return NextResponse.json({ 
           error: `Unsupported file format. Please use PPT, PPTX, or PDF. Detected bytes: ${buffer.slice(0, 4).toString('hex')}` 
         }, { status: 400 });
@@ -252,7 +251,7 @@ export async function POST(request: NextRequest) {
           .eq('id', projectId);
         
         console.log(`[Extract] Cached text for finalist_projects ${projectId}`);
-      } catch (error) {
+      } catch {
         // Ignore cache errors (column might not exist yet)
         console.log('[Extract] Cache save failed, continuing anyway');
       }
@@ -267,11 +266,11 @@ export async function POST(request: NextRequest) {
       duration 
     });
 
-  } catch (error) {
-    console.error('[Extract] Unexpected error:', error);
+  } catch (err) {
+    console.error('[Extract] Unexpected error:', err);
     return NextResponse.json({ 
       error: 'Internal server error',
-      details: error instanceof Error ? error.message : 'Unknown error'
+      details: err instanceof Error ? err.message : 'Unknown error'
     }, { status: 500 });
   }
 }
