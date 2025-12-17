@@ -65,7 +65,7 @@ export default async function VotePage({ params }: { params: Promise<{ id: strin
   const { data: allUserVotes } = await supabase
     .from("votes")
     .select("project_id, criteria_id")
-    .eq("user_id", sessionData.session.user.id);
+    .eq("user_id", user.id);
 
   const totalCriteria = criteria?.length || 0;
 
@@ -190,7 +190,7 @@ export default async function VotePage({ params }: { params: Promise<{ id: strin
           projectId={projectId} 
           criteria={criteria || []} 
           existingVotes={userVotes} 
-          userId={sessionData.session.user.id}
+          userId={user.id}
           nextProjectId={nextProjectId}
         />
       </Card>
