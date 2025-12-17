@@ -83,7 +83,7 @@ export default async function AdminDashboard() {
                 <div>
                   <CardTitle className="text-lg">2. Carica progetti finalisti</CardTitle>
                   <CardDescription className="text-sm mt-1">
-                    Importa l'Excel dei progetti selezionati per la votazione
+                    Importa l&apos;Excel dei progetti selezionati per la votazione
                   </CardDescription>
                 </div>
               </div>

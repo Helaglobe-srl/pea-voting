@@ -71,7 +71,6 @@ export default function AIScoring() {
   const [registrations, setRegistrations] = useState<RegistrationWithScore[]>([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
-  const [currentProcessing, setCurrentProcessing] = useState<number | null>(null);
   const [selectedRegistration, setSelectedRegistration] = useState<RegistrationWithScore | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -150,7 +149,6 @@ export default function AIScoring() {
     }
 
     try {
-      setCurrentProcessing(registration.id);
       updateRegistrationStatus(registration.id, 'processing');
 
       // Extract text from presentation (with caching)
@@ -197,8 +195,6 @@ export default function AIScoring() {
         'error', 
         error instanceof Error ? error.message : 'Unknown error'
       );
-    } finally {
-      setCurrentProcessing(null);
     }
   };
 
