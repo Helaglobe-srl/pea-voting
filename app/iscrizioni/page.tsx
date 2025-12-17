@@ -382,10 +382,15 @@ export default function IscrizioniPage() {
     <div className="min-h-screen flex flex-col">
       {/* header with logo */}
       <div className="w-full border-b bg-background/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-5 py-4">
+        <div className="max-w-5xl mx-auto px-5 py-4 flex justify-between items-center">
           <Link href="/">
             <Image src="/pea-logo.png" alt="PEA Logo" width={180} height={60} className="h-10 w-auto cursor-pointer" />
           </Link>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/">
+              Torna a Home
+            </Link>
+          </Button>
         </div>
       </div>
 
@@ -773,6 +778,7 @@ export default function IscrizioniPage() {
                 }
               }}
             />
+            <p className="text-xs text-red-600 mt-1">Dimensione massima consentita: 10 MB</p>
           </div>
 
           {!marchioFile || !imageFile || !presentationFile ? (
