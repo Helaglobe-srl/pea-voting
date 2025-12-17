@@ -203,8 +203,8 @@ export async function POST(request: NextRequest) {
       try {
         extractedText = await extractTextFromPPTX(buffer);
         console.log(`[Extract] PPTX text extracted: ${extractedText.length} chars`);
-      } catch (error) {
-        console.error('[Extract] PPTX extraction failed, trying generic parser:', error);
+      } catch {
+        console.error('[Extract] PPTX extraction failed, trying generic parser');
         extractedText = await officeParser.parseOfficeAsync(buffer);
       }
     } 
