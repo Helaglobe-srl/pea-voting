@@ -10,6 +10,16 @@
     },
     "app/api/extract-pptx-text/route.ts": {
       "maxDuration": 60,
+      "memory": 1024,
+      "maxRequestBodySize": "20mb"
+    },
+    "app/api/upload-to-drive/route.ts": {
+      "maxDuration": 60,
+      "memory": 1024,
+      "maxRequestBodySize": "20mb"
+    },
+    "app/api/ai-score-project/route.ts": {
+      "maxDuration": 60,
       "memory": 1024
     }
   },

@@ -3,6 +3,7 @@ import { google } from 'googleapis';
 import { drive_v3 } from 'googleapis';
 import { Readable } from 'stream';
 import { cleanText } from '@/lib/validators';
+import { createClient } from '@supabase/supabase-js';
 
 // configure route to handle large file uploads
 export const runtime = 'nodejs';
@@ -256,6 +257,56 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('webhook completato con successo');
+    
+    // step 4: insert into supabase candidate_projects table
+    try {
+      console.log('inserimento nella tabella candidate_projects...');
+      // Use service role to bypass RLS
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+      );
+      
+      const { data: insertData, error: insertError } = await supabase
+        .from('candidate_projects')
+        .insert({
+          ragione_sociale: cleanedFormData.ragione_sociale,
+          tipologia: cleanedFormData.tipologia,
+          titolo_progetto: cleanedFormData.titolo_progetto,
+          area_terapeutica: cleanedFormData.area_terapeutica,
+          categoria: cleanedSummaryData.categoria.toUpperCase(),
+          nome_referente: cleanedFormData.nome_referente,
+          cognome_referente: cleanedFormData.cognome_referente,
+          ruolo: cleanedFormData.ruolo,
+          mail: cleanedFormData.mail,
+          telefono: cleanedFormData.telefono,
+          info_giuria: cleanedSummaryData.info_giuria,
+          sintesi_ebook: cleanedSummaryData.sintesi_ebook,
+          obiettivi: cleanedSummaryData.obiettivi,
+          risultati: cleanedSummaryData.risultati,
+          link_presentazione: fileIds.presentation ? `https://drive.google.com/file/d/${fileIds.presentation}/view` : null,
+          link_marchio: fileIds.marchio ? `https://drive.google.com/file/d/${fileIds.marchio}/view` : null,
+          link_immagine: fileIds.image ? `https://drive.google.com/file/d/${fileIds.image}/view` : null,
+          consenso_privacy: formData.privacy_consent === true,
+          consenso_giuria: formData.jury_consent === true,
+          consenso_marketing: formData.marketing_consent === true,
+          consenso_ai: formData.ai_consent === true,
+        })
+        .select();
+      
+      if (insertError) {
+        console.error('errore inserimento supabase:', insertError);
+        // non fare rollback dei file perché i dati sono già su Google Sheets
+        // questo è solo un errore di backup su database
+        console.warn('dati salvati su google sheets ma non su database supabase');
+      } else {
+        console.log('registrazione inserita su supabase con id:', insertData[0].id);
+      }
+    } catch (dbError) {
+      console.error('errore database supabase:', dbError);
+      // continua comunque perché i dati sono su Google Sheets
+    }
+    
     // tutto è andato a buon fine, restituisci i file ids per l'email di conferma
     return NextResponse.json({ 
       success: true,

@@ -11,12 +11,12 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient();
     
     // Check if user is authenticated and is admin
-    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-    if (sessionError || !sessionData.session) {
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const userEmail = sessionData.session.user.email;
+    const userEmail = user.email;
     const adminEmail = process.env.ADMIN_EMAIL;
     if (!adminEmail || userEmail !== adminEmail) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
       try {
         // check if project already exists by name
         const { data: existingProject, error: checkError } = await supabase
-          .from('projects')
+          .from('finalist_projects')
           .select('id')
           .eq('name', projectData.project_title)
           .single();
@@ -127,9 +127,9 @@ export async function POST(request: NextRequest) {
         }
 
         if (existingProject) {
-          // project already exists - update all details directly in projects table
+          // project already exists - update all details directly in finalist_projects table
           const { error: updateError } = await supabase
-            .from('projects')
+            .from('finalist_projects')
             .update({
               name: projectData.project_title,
               organization_name: projectData.organization_name,
@@ -153,7 +153,7 @@ export async function POST(request: NextRequest) {
         } else {
           // project doesn't exist - create new one with all data
           const { error: projectError } = await supabase
-            .from('projects')
+            .from('finalist_projects')
             .insert({
               name: projectData.project_title,
               organization_name: projectData.organization_name,

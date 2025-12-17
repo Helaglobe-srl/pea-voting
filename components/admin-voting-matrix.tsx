@@ -10,7 +10,7 @@ export async function AdminVotingMatrix() {
   const [votesResult, jurorsResult, projectsResult, criteriaResult] = await Promise.all([
     fetchAllRpcResults<VoteWithEmailAndWeight>(supabase, 'get_votes_with_emails_and_weights_admin'),
     supabase.rpc('get_all_jurors_admin'),
-    supabase.from("projects").select("*").order("id"),
+    supabase.from("finalist_projects").select("*").order("id"),
     supabase.from("voting_criteria").select("*").order("id")
   ]);
 

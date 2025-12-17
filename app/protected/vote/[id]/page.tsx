@@ -11,14 +11,14 @@ export default async function VotePage({ params }: { params: Promise<{ id: strin
   const supabase = await createClient();
 
   // Check if user is authenticated
-  const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-  if (sessionError || !sessionData.session) {
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) {
     redirect("/auth/login");
   }
 
   // Fetch project details with detailed information
   const { data: project, error: projectError } = await supabase
-    .from("projects")
+    .from("finalist_projects")
     .select("*")
     .eq("id", projectId)
     .single();
@@ -57,7 +57,7 @@ export default async function VotePage({ params }: { params: Promise<{ id: strin
 
   // Fetch all projects to determine the next project
   const { data: allProjects } = await supabase
-    .from("projects")
+    .from("finalist_projects")
     .select("id")
     .order("id");
 

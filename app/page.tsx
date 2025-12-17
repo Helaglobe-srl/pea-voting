@@ -10,13 +10,13 @@ import { createClient } from "@/lib/supabase/server";
 export default async function Home() {
   // check authentication status
   const supabase = await createClient();
-  const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
   
-  const isAuthenticated = !sessionError && sessionData.session;
+  const isAuthenticated = !userError && user;
   let isAdmin = false;
   
   if (isAuthenticated) {
-    const userEmail = sessionData.session.user.email;
+    const userEmail = user.email;
     const adminEmail = process.env.ADMIN_EMAIL;
     isAdmin = adminEmail === userEmail;
   }

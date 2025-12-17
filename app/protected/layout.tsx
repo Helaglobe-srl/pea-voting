@@ -1,5 +1,6 @@
 import { EnvVarWarning } from "@/components/env-var-warning";
 import { AuthButton } from "@/components/auth-button";
+import { HomeButton } from "@/components/home-button";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { NavLinks } from "@/components/nav-links";
 import { hasEnvVars } from "@/lib/utils";
@@ -14,11 +15,11 @@ export default async function ProtectedLayout({
 }) {
   // check if user is admin to determine logo link destination
   const supabase = await createClient();
-  const { data: sessionData } = await supabase.auth.getSession();
+  const { data: { user } } = await supabase.auth.getUser();
   
   let logoHref = "/protected"; // default to regular user dashboard
-  if (sessionData.session) {
-    const userEmail = sessionData.session.user.email;
+  if (user) {
+    const userEmail = user.email;
     const adminEmail = process.env.ADMIN_EMAIL;
     const isAdmin = adminEmail && userEmail === adminEmail;
     if (isAdmin) {
@@ -42,6 +43,7 @@ export default async function ProtectedLayout({
             </Link>
             <div className="flex items-center gap-4">
               <NavLinks />
+              <HomeButton />
               {!hasEnvVars ? <EnvVarWarning /> : <AuthButton />}
             </div>
           </div>

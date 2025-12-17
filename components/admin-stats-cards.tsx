@@ -25,7 +25,7 @@ export async function AdminStatsCards() {
   const [votesResult, usersCountResult, projectsResult] = await Promise.all([
     fetchAllRpcResults<VoteWithEmailAndWeight>(supabase, 'get_votes_with_emails_and_weights_admin'),
     supabase.rpc('get_total_users_count', { admin_email_param: adminEmail }),
-    supabase.from("projects").select("*").order("id")
+    supabase.from("finalist_projects").select("*").order("id")
   ]);
 
   if (votesResult.error) {

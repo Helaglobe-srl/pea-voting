@@ -27,13 +27,13 @@ export default async function ProtectedPage({ searchParams }: { searchParams: Pr
   const currentPage = parseInt(params.page || '1', 10);
   const projectsPerPage = 9;
 
-  const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-  if (sessionError || !sessionData.session) {
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) {
     redirect("/auth/login");
   }
 
   // Check if user is admin
-  const userEmail = sessionData.session.user.email;
+  const userEmail = user.email;
   const adminEmail = process.env.ADMIN_EMAIL;
   const isAdmin = adminEmail && userEmail === adminEmail;
 
@@ -44,7 +44,7 @@ export default async function ProtectedPage({ searchParams }: { searchParams: Pr
 
   // Fetch projects from the database (only for regular users)
   const { data: projects, error: projectsError } = await supabase
-    .from("projects")
+    .from("finalist_projects")
     .select("*")
     .order("id");
 

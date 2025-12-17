@@ -27,13 +27,13 @@ export default async function JurorsPage() {
   const supabase = await createClient();
 
   // check if user is authenticated
-  const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-  if (sessionError || !sessionData.session) {
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) {
     redirect("/auth/login");
   }
 
-  // check if user is admin
-  const userEmail = sessionData.session.user.email;
+  // Check if user is admin
+  const userEmail = user.email;
   const adminEmail = process.env.ADMIN_EMAIL;
   if (!adminEmail || userEmail !== adminEmail) {
     redirect("/protected?error=unauthorized");

@@ -10,13 +10,13 @@ export default async function AdminUploadPage() {
   const supabase = await createClient();
 
   // Check if user is authenticated
-  const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-  if (sessionError || !sessionData.session) {
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) {
     redirect("/auth/login");
   }
 
   // Check if user is admin
-  const userEmail = sessionData.session.user.email;
+  const userEmail = user.email;
   const adminEmail = process.env.ADMIN_EMAIL;
   if (!adminEmail || userEmail !== adminEmail) {
     redirect("/protected?error=unauthorized");

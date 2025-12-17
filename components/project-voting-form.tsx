@@ -110,7 +110,7 @@ export default function ProjectVotingForm({ projectId, criteria, existingVotes, 
       
       // Get all projects
       const { data: allProjects } = await supabase
-        .from("projects")
+        .from("finalist_projects")
         .select("id")
         .order("id");
       

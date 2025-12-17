@@ -19,13 +19,13 @@ export default async function ResultsPage() {
   const supabase = await createClient();
 
   // check if user is authenticated
-  const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-  if (sessionError || !sessionData.session) {
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) {
     redirect("/auth/login");
   }
 
-  // check if user is admin by email
-  const userEmail = sessionData.session.user.email;
+  // Check if user is admin
+  const userEmail = user.email;
   const adminEmail = process.env.ADMIN_EMAIL;
   if (!adminEmail || !userEmail || userEmail !== adminEmail) {
     redirect("/protected?error=unauthorized");
@@ -45,7 +45,7 @@ export default async function ResultsPage() {
 
   // fetch projects and criteria
   const { data: projects, error: projectsError } = await supabase
-    .from("projects")
+    .from("finalist_projects")
     .select("*")
     .order("id");
 

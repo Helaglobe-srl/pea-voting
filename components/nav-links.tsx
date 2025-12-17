@@ -19,11 +19,6 @@ export async function NavLinks() {
 
   return (
     <div className="flex items-center gap-4">
-      {/* home link - always visible */}
-      <Link href="/" className="hover:underline">
-        Home
-      </Link>
-      
       {/* show profilo link only for normal users (not admin) */}
       {!isAdmin && (
         <Link href="/protected/profile" className="hover:underline">
