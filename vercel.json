@@ -2,8 +2,7 @@
   "functions": {
     "app/api/submit-registration-transactional/route.ts": {
       "maxDuration": 60,
-      "memory": 1024,
-      "maxRequestBodySize": "10mb"
+      "memory": 1024
     },
     "app/api/analyze-presentation/route.ts": {
       "maxDuration": 60,
