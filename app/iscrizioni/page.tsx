@@ -412,11 +412,11 @@ export default function IscrizioniPage() {
           <Link href="/">
             <Image src="/pea-logo.png" alt="PEA Logo" width={180} height={60} className="h-10 w-auto cursor-pointer" />
           </Link>
-          <Button asChild variant="outline" size="sm">
+          {/* <Button asChild variant="outline" size="sm">
             <Link href="/">
               Torna a Home
             </Link>
-          </Button>
+          </Button> */}
         </div>
       </div>
 
