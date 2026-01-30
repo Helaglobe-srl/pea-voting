@@ -82,6 +82,21 @@ export default function IscrizioniPage() {
       return;
     }
 
+    // validazione dimensione file (10mb = 10 * 1024 * 1024 bytes)
+    const maxFileSize = 10 * 1024 * 1024;
+    const filesToCheck = [
+      { file: marchioFile, name: "logo aziendale" },
+      { file: imageFile, name: "immagine rappresentativa" },
+      { file: presentationFile, name: "presentazione" }
+    ];
+
+    for (const { file, name } of filesToCheck) {
+      if (file && file.size > maxFileSize) {
+        setError(`Il file caricato supera il limite di 10 mb. Si consiglia di utilizzare il template fornito appositamente per l'evento.`);
+        return;
+      }
+    }
+
     setLoading(true);
     setError("");
 
@@ -139,7 +154,9 @@ export default function IscrizioniPage() {
         setSuccess("✅ presentazione analizzata con successo!");
       }
     } catch (err) {
-      setError(`errore durante l'analisi: ${err instanceof Error ? err.message : "errore sconosciuto"}`);
+      const errorMessage = err instanceof Error ? err.message : "errore sconosciuto";
+      const templateSuggestion = " è fortemente consigliato utilizzare il template fornito appositamente per l'evento affinché la procedura vada a buon fine.";
+      setError(`errore durante l'analisi: ${errorMessage}${templateSuggestion}`);
     } finally {
       setLoading(false);
     }
@@ -326,18 +343,24 @@ export default function IscrizioniPage() {
 
       if (!registrationResponse.ok) {
         let errorMessage = `errore durante la sottomissione: ${registrationResponse.status}`;
-        try {
-          const errorData = await registrationResponse.json();
-          errorMessage = errorData.details || errorData.error || errorMessage;
-        } catch {
-          // se non è json, prova a leggere come testo
+        
+        // gestione speciale per errori 413 (file troppo grande)
+        if (registrationResponse.status === 413) {
+          errorMessage = "Il file caricato supera il limite di 10 mb. Si consiglia di alleggerire il file rimpicciolendo le immagini o comprimendo il pdf. È fortemente consigliato utilizzare il template fornito appositamente per l'evento affinché la procedura vada a buon fine.";
+        } else {
           try {
-            const errorText = await registrationResponse.text();
-            if (errorText) {
-              errorMessage = errorText.substring(0, 200); // limita la lunghezza
-            }
+            const errorData = await registrationResponse.json();
+            errorMessage = errorData.details || errorData.error || errorMessage;
           } catch {
-            // usa il messaggio di default
+            // se non è json, prova a leggere come testo
+            try {
+              const errorText = await registrationResponse.text();
+              if (errorText) {
+                errorMessage = errorText.substring(0, 200); // limita la lunghezza
+              }
+            } catch {
+              // usa il messaggio di default
+            }
           }
         }
         throw new Error(errorMessage);
@@ -374,8 +397,8 @@ export default function IscrizioniPage() {
       // redirect alla pagina di successo
       router.push("/iscrizioni/success");
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "errore sconosciuto";
-      setError(`si è verificato un errore durante l'iscrizione: ${errorMessage}`);
+      const errorMessage = "L'iscrizione è fallita probabilmente a causa dell'eccessiva dimensione della presentazione caricata o perché non è compatibile. È fortemente consigliato utilizzare il template fornito appositamente per l'evento affinché la procedura vada a buon fine.";
+      setError(errorMessage);
     } finally {
       setSubmitting(false);
     }
@@ -743,6 +766,18 @@ export default function IscrizioniPage() {
       <Card className="border-2 shadow-lg hover:shadow-xl transition-shadow">
         <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950">
           <CardTitle className="text-2xl">📁 Caricamento File</CardTitle>
+          <CardDescription className="text-base pt-2">
+            💡 È fortemente consigliato utilizzare il{" "}
+            <a 
+              href="https://helaglobe.com/patient-engagement-award/" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-blue-600 dark:text-blue-400 underline font-semibold hover:text-blue-700 dark:hover:text-blue-300"
+            >
+              template ufficiale
+            </a>
+            {" "}fornito da Helaglobe per garantire il corretto caricamento dei file.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6 pt-6">
           <div>

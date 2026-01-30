@@ -119,11 +119,22 @@ export async function POST(request: NextRequest) {
     // extract files
     const files: { [key: string]: { file: File; fileName: string } } = {};
     const fileKeys = ['marchio', 'image', 'presentation'];
+    const maxFileSize = 10 * 1024 * 1024; // 10mb in bytes
     
     for (const key of fileKeys) {
       const file = formDataRequest.get(key) as File | null;
       const fileName = formDataRequest.get(`${key}_fileName`) as string | null;
       if (file && fileName) {
+        // validazione dimensione file
+        if (file.size > maxFileSize) {
+          return NextResponse.json(
+            { 
+              error: 'file troppo grande', 
+              details: 'il file caricato supera il limite di 10 mb: alleggeriscilo rimpicciolendo le immagini o comprimendo il pdf. è fortemente consigliato utilizzare il template di ppt fornito da hg appositamente per il pea affinché la procedura vada a buon fine.' 
+            },
+            { status: 413 }
+          );
+        }
         files[key] = { file, fileName };
       }
     }
