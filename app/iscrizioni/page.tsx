@@ -743,17 +743,17 @@ export default function IscrizioniPage() {
         </CardHeader>
         <CardContent className="space-y-6 pt-6">
           <div>
-            <Label htmlFor="marchio">Logo aziendale (in alta risoluzione o vettoriale) *</Label>
+            <Label htmlFor="marchio">Logo aziendale JPEG o AI (in alta risoluzione o vettoriale) *</Label>
             <Input
               id="marchio"
               type="file"
-              accept=".png,.jpg,.jpeg,.pdf,.svg"
+              accept=".png,.jpg,.jpeg,.pdf,.svg,.ai"
               onChange={(e) => setMarchioFile(e.target.files?.[0] || null)}
             />
           </div>
 
           <div>
-            <Label htmlFor="image">Immagine rappresentativa del progetto (preferibilmente 1920x1080 pixel) *</Label>
+            <Label htmlFor="image">Immagine rappresentativa del progetto JPEG o PNG (preferibilmente 1920x1080 pixel) *</Label>
             <Input
               id="image"
               type="file"
