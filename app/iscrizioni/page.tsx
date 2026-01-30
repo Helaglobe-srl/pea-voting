@@ -56,6 +56,7 @@ export default function IscrizioniPage() {
   const [aiConsent, setAiConsent] = useState(false);
   const [privacyConsent, setPrivacyConsent] = useState(false);
   const [juryConsent, setJuryConsent] = useState(false);
+  const [regulationConsent, setRegulationConsent] = useState(false);
   const [marketingConsent, setMarketingConsent] = useState(false);
 
   // upload state - removed: now using transactional api
@@ -231,6 +232,7 @@ export default function IscrizioniPage() {
     // validazione consensi
     if (!privacyConsent) errors.privacy_consent = "consenso obbligatorio";
     if (!juryConsent) errors.jury_consent = "consenso obbligatorio";
+    if (!regulationConsent) errors.regulation_consent = "consenso obbligatorio";
     if (!aiConsent) errors.ai_consent = "consenso obbligatorio";
 
     if (Object.keys(errors).length > 0) {
@@ -263,6 +265,7 @@ export default function IscrizioniPage() {
         area_terapeutica: finalAreeTerapeutiche,
         privacy_consent: privacyConsent,
         jury_consent: juryConsent,
+        regulation_consent: regulationConsent,
         marketing_consent: marketingConsent,
         ai_consent: aiConsent,
       };
@@ -969,6 +972,36 @@ export default function IscrizioniPage() {
                 {fieldErrors.jury_consent && (
                   <p className="text-sm text-red-600 mt-1 ml-6 flex items-center gap-1">
                     <span>⚠️</span> {fieldErrors.jury_consent}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <div className="flex items-start space-x-2">
+                  <Checkbox
+                    id="regulation-consent"
+                    checked={regulationConsent}
+                    onCheckedChange={(checked) => {
+                      setRegulationConsent(checked as boolean);
+                      if (fieldErrors.regulation_consent) {
+                        const newErrors = { ...fieldErrors };
+                        delete newErrors.regulation_consent;
+                        setFieldErrors(newErrors);
+                      }
+                    }}
+                    className={fieldErrors.regulation_consent ? "border-red-500" : ""}
+                  />
+                  <label htmlFor="regulation-consent" className="text-sm">
+                    Dichiaro di aver letto e accettato il{" "}
+                    <a href="https://helaglobe.com/regolamento-patient-engagement-award-2026/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                      Regolamento
+                    </a>{" "}
+                    del Patient Engagement Award 2026 *
+                  </label>
+                </div>
+                {fieldErrors.regulation_consent && (
+                  <p className="text-sm text-red-600 mt-1 ml-6 flex items-center gap-1">
+                    <span>⚠️</span> {fieldErrors.regulation_consent}
                   </p>
                 )}
               </div>
