@@ -413,7 +413,7 @@ export default function IscrizioniPage() {
       {/* header with logo */}
       <div className="w-full border-b bg-background/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-5 py-4 flex justify-between items-center">
-          <Link href="/">
+          <Link href="https://helaglobe.com/patient-engagement-award/" target="_blank" rel="noopener noreferrer">
             <Image src="/pea-logo.png" alt="PEA Logo" width={180} height={60} className="h-10 w-auto cursor-pointer" />
           </Link>
           {/* <Button asChild variant="outline" size="sm">
