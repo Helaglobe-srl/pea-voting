@@ -79,6 +79,8 @@ export default function IscrizioniPage() {
   const handleAnalyzePresentation = async () => {
     if (!presentationFile) {
       setError("per favore carica la presentazione prima di procedere");
+      // scroll to top to show error message
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
@@ -92,7 +94,9 @@ export default function IscrizioniPage() {
 
     for (const { file, name } of filesToCheck) {
       if (file && file.size > maxFileSize) {
-        setError(`Il file caricato supera il limite di 10 mb. Si consiglia di utilizzare il template fornito appositamente per l'evento.`);
+        setError(`Il file caricato supera il limite di 10 mb. Si consiglia di utilizzare il template fornito appositamente per l'evento o comprimere il file.`);
+        // scroll to top to show error message
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
     }
@@ -769,7 +773,7 @@ export default function IscrizioniPage() {
           <CardDescription className="text-base pt-2">
             💡 È fortemente consigliato utilizzare il{" "}
             <a 
-              href="https://helaglobe.com/patient-engagement-award/" 
+              href="https://helaglobe.com/wp-content/uploads/2026/02/PATIENT-ENGAGEMENT-AWARD-2026-TEMPLATE-CANDIDATURA-1-1.pptx" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="text-blue-600 dark:text-blue-400 underline font-semibold hover:text-blue-700 dark:hover:text-blue-300"

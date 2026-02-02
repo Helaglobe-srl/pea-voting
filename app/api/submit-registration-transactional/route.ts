@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
           return NextResponse.json(
             { 
               error: 'file troppo grande', 
-              details: 'il file caricato supera il limite di 10 mb: alleggeriscilo rimpicciolendo le immagini o comprimendo il pdf. è fortemente consigliato utilizzare il template di ppt fornito da hg appositamente per il pea affinché la procedura vada a buon fine.' 
+              details: 'Il file caricato supera il limite di 10 mb. Si consiglia di utilizzare il template fornito appositamente per l\'evento o comprimere il file.' 
             },
             { status: 413 }
           );
