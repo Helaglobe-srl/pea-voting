@@ -6,21 +6,25 @@ import { hasEnvVars } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
+import { isVotingAllowedFor } from "@/lib/voting";
 
 export default async function Home() {
   // check authentication status
   const supabase = await createClient();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
-  
+
   const isAuthenticated = !userError && user;
   let isAdmin = false;
-  
+  let canVote = false;
+
   if (isAuthenticated) {
     const userEmail = user.email;
     const adminEmail = process.env.ADMIN_EMAIL;
     isAdmin = adminEmail === userEmail;
+    // solo le email in VOTING_ALLOWED_EMAILS possono ancora votare
+    canVote = !isAdmin && isVotingAllowedFor(userEmail);
   }
-  
+
   // show home page with two cards: iscrizioni (public) and votazione (authenticated users)
   return (
     <main className="min-h-screen flex flex-col items-center">
@@ -43,16 +47,16 @@ export default async function Home() {
             </div>
           </div>
         </nav>
-        
+
         <div className="flex-1 flex flex-col gap-12 max-w-5xl p-5 w-full">
           {/* hero section */}
           <div className="text-center space-y-6">
             <div className="flex justify-center mb-6">
-              <Image 
-                src="/pea-logo.png" 
-                alt="Patient Engagement Award" 
-                width={400} 
-                height={150} 
+              <Image
+                src="/pea-logo.png"
+                alt="Patient Engagement Award"
+                width={400}
+                height={150}
                 className="w-auto h-32 md:h-40"
                 priority
               />
@@ -85,27 +89,8 @@ export default async function Home() {
               </div>
             </Link>
 
-            {/* votazione card - requires authentication */}
-            {isAuthenticated && !isAdmin ? (
-              <Link href="/protected" className="block group">
-                <div className="h-full border-2 rounded-2xl p-8 hover:border-green-600 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900">
-                  <div className="flex flex-col items-center text-center space-y-4">
-                    <div className="w-20 h-20 bg-green-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                      </svg>
-                    </div>
-                    <h3 className="text-2xl font-bold">Votazione Giuria</h3>
-                    <p className="text-muted-foreground">
-                      Accedi all&apos;area riservata per votare i progetti candidati. Solo per membri della giuria.
-                    </p>
-                    <div className="mt-4 px-6 py-2 bg-green-600 text-white rounded-full font-semibold group-hover:bg-green-700 transition-colors">
-                      Vai alla Votazione →
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            ) : isAdmin ? (
+            {/* votazione card */}
+            {isAdmin ? (
               <Link href="/protected/admin" className="block group">
                 <div className="h-full border-2 rounded-2xl p-8 hover:border-purple-600 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900">
                   <div className="flex flex-col items-center text-center space-y-4">
@@ -125,6 +110,41 @@ export default async function Home() {
                   </div>
                 </div>
               </Link>
+            ) : isAuthenticated && canVote ? (
+              <Link href="/protected" className="block group">
+                <div className="h-full border-2 rounded-2xl p-8 hover:border-green-600 hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900">
+                  <div className="flex flex-col items-center text-center space-y-4">
+                    <div className="w-20 h-20 bg-green-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                      </svg>
+                    </div>
+                    <h3 className="text-2xl font-bold">Votazione Giuria</h3>
+                    <p className="text-muted-foreground">
+                      Accedi all&apos;area riservata per votare i progetti candidati. Solo per membri della giuria.
+                    </p>
+                    <div className="mt-4 px-6 py-2 bg-green-600 text-white rounded-full font-semibold group-hover:bg-green-700 transition-colors">
+                      Vai alla Votazione →
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ) : isAuthenticated ? (
+              /* giurato autenticato ma non più in lista: votazioni chiuse */
+              <div className="h-full border-2 rounded-2xl p-8 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-950 dark:to-amber-900">
+                <div className="flex flex-col items-center text-center space-y-4">
+                  <div className="w-20 h-20 bg-amber-500 rounded-full flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <h3 className="text-2xl font-bold">Votazioni Chiuse</h3>
+                  <p className="text-muted-foreground">
+                    Grazie per aver votato. Le votazioni 2026 sono chiuse.<br />
+                    Ci vediamo alla prossima edizione!
+                  </p>
+                </div>
+              </div>
             ) : (
               <div className="h-full border-2 rounded-2xl p-8 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 opacity-75">
                 <div className="flex flex-col items-center text-center space-y-4">
